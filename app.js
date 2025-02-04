@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to MongoDB (updated: removed deprecated options)
+// Connect to MongoDB (without deprecated options)
 mongoose.connect('mongodb://localhost/car_rental')
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
@@ -20,13 +20,20 @@ mongoose.connect('mongodb://localhost/car_rental')
 // Mongoose Models
 // -----------------------
 
-// Car model
+// Updated Car model with extra reminder fields and custom reminder.
 const CarSchema = new mongoose.Schema({
-  make:       String,
-  model:      String,
-  year:       Number,
-  mileage:    Number,
-  serviceDue: Date
+  make:              String,
+  model:             String,
+  year:              Number,
+  mileage:           Number,
+  serviceDue:        Date,
+  tireChangeDate:    Date,   // new field
+  registrationDate:  Date,   // new field
+  taxDate:           Date,   // new field
+  customReminder: {           // new custom reminder field
+    message: String,
+    date:    Date
+  }
 });
 const Car = mongoose.model('Car', CarSchema);
 
@@ -54,7 +61,6 @@ const Rental = mongoose.model('Rental', RentalSchema);
 // -----------------------
 
 // ----- Cars endpoints -----
-
 // GET /api/cars - Retrieve all cars
 app.get('/api/cars', async (req, res) => {
   try {
@@ -79,8 +85,36 @@ app.post('/api/cars', async (req, res) => {
   }
 });
 
-// ----- Rental endpoints -----
+// POST /api/cars/:id/reminders - Update reminder dates for a specific car
+app.post('/api/cars/:id/reminders', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { serviceDue, tireChangeDate, registrationDate, taxDate, customReminderMessage, customReminderDate } = req.body;
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ error: 'Car not found' });
+    }
+    if (serviceDue) car.serviceDue = new Date(serviceDue);
+    if (tireChangeDate) car.tireChangeDate = new Date(tireChangeDate);
+    if (registrationDate) car.registrationDate = new Date(registrationDate);
+    if (taxDate) car.taxDate = new Date(taxDate);
+    if (customReminderMessage) {
+      if (!car.customReminder) car.customReminder = {};
+      car.customReminder.message = customReminderMessage;
+    }
+    if (customReminderDate) {
+      if (!car.customReminder) car.customReminder = {};
+      car.customReminder.date = new Date(customReminderDate);
+    }
+    await car.save();
+    res.json({ message: 'Reminders updated successfully', car });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating reminders' });
+  }
+});
 
+// ----- Rental endpoints -----
 // POST /api/rentals - Add a new rental
 app.post('/api/rentals', async (req, res) => {
   try {
@@ -131,7 +165,7 @@ app.get('/api/rentals', async (req, res) => {
   }
 });
 
-// POST /api/rentals/:id/end - Mark a rental as ended (via early return or natural end)
+// POST /api/rentals/:id/end - Mark a rental as ended
 app.post('/api/rentals/:id/end', async (req, res) => {
   try {
     const { id } = req.params;

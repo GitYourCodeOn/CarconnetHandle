@@ -13,6 +13,8 @@
     .tab-pane.active { display: block; }
     /* Optional margin for progress bars */
     .progress { margin-bottom: 10px; }
+    /* Spanner button style override */
+    .spanner-btn { border: none; }
   </style>
 </head>
 <body>
@@ -68,7 +70,8 @@
             <input type="number" class="form-control" name="mileage" placeholder="Mileage" required>
           </div>
           <div class="form-group col-md-2">
-            <input type="date" class="form-control" name="serviceDue" required>
+            <!-- Service Due is still entered here -->
+            <input type="date" class="form-control" name="serviceDue" placeholder="Service Due" required>
           </div>
         </div>
         <button type="submit" class="btn btn-primary">Add Car</button>
@@ -83,6 +86,7 @@
             <th>Year</th>
             <th>Mileage</th>
             <th>Service Due</th>
+            <th>Reminders</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -205,6 +209,7 @@
           <button class="btn btn-sm btn-outline-secondary" id="updateAccountBtn">Update</button>
         </div>
       </div>
+      <!-- (Finances content unchanged) -->
       <div class="mb-3">
         <div class="form-row">
           <div class="form-group col-md-3">
@@ -339,6 +344,54 @@
   </div>
 </div>
 
+<!-- Modal for Updating Reminders on a Car -->
+<div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="reminderForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reminderModalLabel">Update Reminders</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="carId" id="reminderCarId">
+          <div class="form-group">
+            <label for="reminderServiceDue">Service Due Date</label>
+            <input type="date" class="form-control" name="serviceDue" id="reminderServiceDue">
+          </div>
+          <div class="form-group">
+            <label for="reminderTireChangeDate">Tire Change Date</label>
+            <input type="date" class="form-control" name="tireChangeDate" id="reminderTireChangeDate">
+          </div>
+          <div class="form-group">
+            <label for="reminderRegistrationDate">Registration Date</label>
+            <input type="date" class="form-control" name="registrationDate" id="reminderRegistrationDate">
+          </div>
+          <div class="form-group">
+            <label for="reminderTaxDate">Tax Date</label>
+            <input type="date" class="form-control" name="taxDate" id="reminderTaxDate">
+          </div>
+          <!-- New custom reminder row -->
+          <div class="form-group">
+            <label for="reminderCustomMessage">Custom Reminder Message</label>
+            <input type="text" class="form-control" name="customReminderMessage" id="reminderCustomMessage" placeholder="Enter custom reminder">
+          </div>
+          <div class="form-group">
+            <label for="reminderCustomDate">Custom Reminder Date</label>
+            <input type="date" class="form-control" name="customReminderDate" id="reminderCustomDate">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Reminders</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -347,19 +400,57 @@
   // ---------------------------
   // Utility Functions
   // ---------------------------
-
-  // Load available cars for Dashboard and update lists/dropdowns
+  
+  // Compute the color class based on the soonest upcoming reminder.
+  function getReminderColor(car) {
+    const now = new Date();
+    let minDiff = Infinity;
+    const reminderDates = [];
+    if (car.serviceDue) reminderDates.push(new Date(car.serviceDue));
+    if (car.tireChangeDate) reminderDates.push(new Date(car.tireChangeDate));
+    if (car.registrationDate) reminderDates.push(new Date(car.registrationDate));
+    if (car.taxDate) reminderDates.push(new Date(car.taxDate));
+    if (car.customReminder && car.customReminder.date) {
+      reminderDates.push(new Date(car.customReminder.date));
+    }
+    reminderDates.forEach(d => {
+      if (d > now) {
+        const diffDays = (d - now) / (1000 * 60 * 60 * 24);
+        if (diffDays < minDiff) {
+          minDiff = diffDays;
+        }
+      }
+    });
+    if (minDiff === Infinity) {
+      return "bg-success"; // No upcoming reminders set
+    } else if (minDiff <= 7) {
+      return "bg-danger";
+    } else if (minDiff <= 30) {
+      return "bg-warning";
+    } else {
+      return "bg-success";
+    }
+  }
+  
+  // Load cars and update dropdowns and the cars table with the spanner button.
   function loadCars() {
     $.get('/api/cars', function(data) {
       let rows = '';
       let options = '<option value="">Select Car</option>';
       data.forEach(function(car) {
+        // Determine the spanner button color based on all reminder dates.
+        const colorClass = getReminderColor(car);
         rows += `<tr>
           <td>${car.make}</td>
           <td>${car.model}</td>
           <td>${car.year}</td>
           <td>${car.mileage}</td>
-          <td>${new Date(car.serviceDue).toLocaleDateString()}</td>
+          <td>${car.serviceDue ? new Date(car.serviceDue).toLocaleDateString() : ''}</td>
+          <td>
+            <button class="btn btn-sm spanner-btn ${colorClass} text-white" data-id="${car._id}" data-car='${JSON.stringify(car)}'>
+              🔧
+            </button>
+          </td>
         </tr>`;
         options += `<option value="${car._id}">${car.make} ${car.model} (${car.year})</option>`;
       });
@@ -370,8 +461,8 @@
       alert('Failed to load cars.');
     });
   }
-
-  // Load active rentals for the Dashboard with progress bars and End Early buttons
+  
+  // Load active rentals for Dashboard with progress bars and End Early buttons.
   function loadActiveRentals() {
     $.get('/api/rentals/active', function(rentals) {
       let rentalHtml = '<h4 class="mt-4">Active Rentals</h4>';
@@ -399,14 +490,13 @@
         });
         rentalHtml += '</div>';
       }
-      // Append active rentals to the Dashboard (after available cars)
       $('#dashboardContent').append(rentalHtml);
     }).fail(function() {
       alert('Failed to load active rentals.');
     });
   }
-
-  // Load available cars for Dashboard (separate section)
+  
+  // Load available cars (for Dashboard's available cars section)
   function loadAvailableCars() {
     $.get('/api/cars', function(cars) {
       let availableHtml = '<h4>Available Cars</h4>';
@@ -424,19 +514,18 @@
       $('#dashboardContent').html('<p class="text-danger">Failed to load available cars.</p>');
     });
   }
-
-  // Load active rentals and available cars into the Dashboard
+  
+  // Load Dashboard (available cars and active rentals)
   function loadDashboard() {
     loadAvailableCars();
     loadActiveRentals();
   }
-
-  // Load all rentals to populate the Rentals tab table (with Status column)
+  
+  // Load all rentals for the Rentals tab table.
   function loadRentals() {
     $.get('/api/rentals', function(rentals) {
       let rows = '';
       rentals.forEach(function(rental) {
-        // Determine status: active means "Rented", otherwise "Available"
         const status = rental.active ? 'Rented' : 'Available';
         const carInfo = rental.car 
           ? `${rental.car.make} ${rental.car.model} (${rental.car.year})`
@@ -463,8 +552,8 @@
       alert('Failed to load rentals.');
     });
   }
-
-  // Load logs for Data tab – one row per rental with the required columns
+  
+  // Load logs for Data tab – one row per rental with the required columns.
   function loadData() {
     $.get('/api/rentals', function(rentals) {
       let rows = '';
@@ -484,7 +573,7 @@
       alert('Failed to load rental logs.');
     });
   }
-
+  
   // ---------------------------
   // Event Handlers
   // ---------------------------
@@ -501,14 +590,13 @@
       if(target === "#dashboardTab"){
         loadDashboard();
       } else if(target === "#carsTab"){
-        loadCars();
+        loadCars(); // refresh cars table and dropdowns
       } else if(target === "#rentalsTab"){
         loadCars();    // refresh car dropdown for the rental form
         loadRentals();
       } else if(target === "#dataTab"){
         loadData();
       }
-      // Add additional tab-specific loaders as needed.
     });
     
     // Handle Add Car form submission
@@ -547,6 +635,36 @@
       $('#earlyReturnModal').modal('show');
     });
     
+    // Delegate click event for the spanner icon on a car row (to update reminders)
+    $(document).on('click', '.spanner-btn', function(){
+      const carId = $(this).data('id');
+      const car = JSON.parse($(this).attr('data-car'));
+      $('#reminderCarId').val(carId);
+      // Pre-populate fixed reminder inputs
+      $('#reminderServiceDue').val(car.serviceDue ? new Date(car.serviceDue).toISOString().split('T')[0] : '');
+      $('#reminderTireChangeDate').val(car.tireChangeDate ? new Date(car.tireChangeDate).toISOString().split('T')[0] : '');
+      $('#reminderRegistrationDate').val(car.registrationDate ? new Date(car.registrationDate).toISOString().split('T')[0] : '');
+      $('#reminderTaxDate').val(car.taxDate ? new Date(car.taxDate).toISOString().split('T')[0] : '');
+      // Pre-populate custom reminder inputs
+      $('#reminderCustomMessage').val(car.customReminder ? car.customReminder.message : '');
+      $('#reminderCustomDate').val(car.customReminder && car.customReminder.date ? new Date(car.customReminder.date).toISOString().split('T')[0] : '');
+      $('#reminderModal').modal('show');
+    });
+    
+    // Handle Reminder form submission
+    $('#reminderForm').submit(function(e) {
+      e.preventDefault();
+      const carId = $('#reminderCarId').val();
+      const formData = $(this).serialize();
+      $.post('/api/cars/' + carId + '/reminders', formData, function(response) {
+        alert('Reminders updated successfully!');
+        $('#reminderModal').modal('hide');
+        loadCars(); // reload cars table to update spanner icon color
+      }).fail(function() {
+        alert('Error updating reminders.');
+      });
+    });
+    
     // Handle Early Return / Complete Rental modal submission
     $('#earlyReturnForm').submit(function(e) {
       e.preventDefault();
@@ -562,7 +680,7 @@
       });
     });
     
-    // Initial load of Dashboard tab on page load
+    // Initial load of Dashboard on page load
     loadDashboard();
   });
 </script>

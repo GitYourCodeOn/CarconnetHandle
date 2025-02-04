@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost/car_rental', { useNewUrlParser: true, useUnifiedTopology: true })
+// Connect to MongoDB (updated: removed deprecated options)
+mongoose.connect('mongodb://localhost/car_rental')
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 

@@ -45,7 +45,9 @@ router.get('/active', async (req, res) => {
 // GET /api/rentals - Retrieve all rentals (active and ended), populated with car details
 router.get('/', async (req, res) => {
   try {
-    const rentals = await Rental.find({}).populate('car');
+    const rentals = await Rental.find()
+      .populate('car', 'make model')
+      .sort({ rentalDate: -1 });
     res.json(rentals);
   } catch (err) {
     console.error(err);

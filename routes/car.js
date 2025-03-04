@@ -6,11 +6,11 @@ const Car = require('../models/car')
 // GET /api/cars - Retrieve all cars
 router.get('/', async (req, res) => {
   try {
-    const cars = await Car.find({});
+    const cars = await Car.find({ isDeleted: { $ne: true } });
     res.json(cars);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Error fetching cars' });
   }
 });
 

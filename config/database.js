@@ -1,13 +1,38 @@
 // config/database.js
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-const MONGO_URI = 'mongodb://localhost/car_rental'; // You can also use an environment variable
+// Fix for strictQuery deprecation warning
+mongoose.set('strictQuery', false);
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/car_rental';
 
-module.exports = mongoose;
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      // Add these options for persistence
+      autoIndex: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    console.log('MongoDB connected successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    console.error('MongoDB URI:', MONGO_URI);
+    process.exit(1);
+  }
+};
+
+// Handle connection errors after initial connection
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected. Attempting to reconnect...');
+  connectDB();
+});
+
+module.exports = connectDB;

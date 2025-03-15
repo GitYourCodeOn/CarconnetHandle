@@ -38,6 +38,10 @@ const CarSchema = new mongoose.Schema({
   isDeleted: {
     type: Boolean,
     default: false
+  },
+  isRented: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

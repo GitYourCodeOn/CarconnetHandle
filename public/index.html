@@ -15,6 +15,77 @@
     .progress { margin-bottom: 10px; }
     /* Spanner button style override */
     .spanner-btn { border: none; }
+    /* Add to your existing styles */
+    .rental-details {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 10px 0;
+    }
+
+    .rental-details p {
+        margin-bottom: 0.5rem;
+    }
+
+    .rental-details i {
+        width: 20px;
+        color: #6c757d;
+    }
+
+    input[type="datetime-local"] {
+        padding: 0.5rem;
+    }
+
+    .text-danger {
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    /* Add to your existing styles */
+    .rental-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .rental-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .rental-form label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .rental-form .form-control {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .rental-form .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .custom-select {
+        height: calc(1.5em + 1.5rem + 2px);
+    }
+
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -46,9 +117,54 @@
   <div class="tab-content mt-4">
     <!-- Dashboard Tab -->
     <div id="dashboardTab" class="tab-pane active">
-      <h3>Dashboard</h3>
-      <div id="dashboardContent">
-        <!-- Available cars and active rentals will load here -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <h5 class="card-title">Total Fleet</h5>
+              <h2 class="card-text" id="totalFleet">0</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <h5 class="card-title">Available Cars</h5>
+              <h2 class="card-text" id="availableCars">0</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-warning text-white">
+            <div class="card-body">
+              <h5 class="card-title">Active Rentals</h5>
+              <h2 class="card-text" id="activeRentals">0</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h4 class="mb-0">Available Cars</h4>
+            </div>
+            <div class="card-body" id="availableCarsContent">
+              <!-- Available cars will be loaded here -->
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-warning text-white">
+              <h4 class="mb-0">Active Rentals</h4>
+            </div>
+            <div class="card-body" id="activeRentalsContent">
+              <!-- Active rentals will be loaded here -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -95,71 +211,90 @@
     
     <!-- Rentals Tab -->
     <div id="rentalsTab" class="tab-pane">
-      <h3>Add Rental</h3>
-      <form id="addRentalForm">
-        <div class="form-row">
-          <div class="form-group col-md-3">
-            <select class="form-control" name="car" required>
-              <option value="">Select Car</option>
-            </select>
+      <div class="rental-form-container">
+        <h3 class="mb-4">Add New Rental</h3>
+        <form id="addRentalForm" class="rental-form">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-car mr-2"></i>Select Car</label>
+                <select class="form-control custom-select" name="car" required>
+                  <option value="">Choose a car...</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-pound-sign mr-2"></i>Rental Fee</label>
+                <input type="number" class="form-control" name="rentalFee" placeholder="Enter rental fee" required>
+              </div>
+            </div>
           </div>
-          <div class="form-group col-md-3">
-            <input type="date" class="form-control" name="rentalDate" required>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="far fa-calendar-alt mr-2"></i>Start Date & Time</label>
+                <input type="datetime-local" class="form-control" name="rentalDate" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="far fa-calendar-alt mr-2"></i>Return Date & Time</label>
+                <input type="datetime-local" class="form-control" name="returnDate" required>
+              </div>
+            </div>
           </div>
-          <div class="form-group col-md-3">
-            <input type="date" class="form-control" name="returnDate" required>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="far fa-user mr-2"></i>Customer Name</label>
+                <input type="text" class="form-control" name="customerName" placeholder="Enter customer name" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="far fa-id-card mr-2"></i>Customer ID/Reg</label>
+                <input type="text" class="form-control" name="customerReg" placeholder="Enter customer ID/registration">
+              </div>
+            </div>
           </div>
-          <div class="form-group col-md-3">
-            <input type="number" step="0.01" class="form-control" name="rentalFee" placeholder="Rental Fee" required>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="far fa-envelope mr-2"></i>Customer Email</label>
+                <input type="email" class="form-control" name="customerEmail" placeholder="Enter customer email">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-phone mr-2"></i>Customer Phone</label>
+                <input type="tel" class="form-control" name="customerNumber" placeholder="Enter customer phone">
+              </div>
+            </div>
           </div>
+
+          <div class="form-group">
+            <label><i class="far fa-sticky-note mr-2"></i>Notes</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Add any additional notes"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-plus-circle mr-2"></i>Create Rental
+          </button>
+        </form>
+      </div>
+
+      <div class="rentals-list mt-5">
+        <h3 class="mb-4">All Rentals</h3>
+        <div class="table-responsive">
+          <table class="table" id="rentalsTable">
+            <!-- Table content -->
+          </table>
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="customerName" placeholder="Customer Name" required>
-          </div>
-          <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="customerReg" placeholder="Customer Reg">
-          </div>
-          <div class="form-group col-md-4">
-            <input type="email" class="form-control" name="customerEmail" placeholder="Customer Email">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="customerNumber" placeholder="Customer Number">
-          </div>
-          <div class="form-group col-md-4">
-            <select class="form-control" name="rentalType" required>
-              <option value="">Select Rental Type</option>
-              <option value="Rental">Rental</option>
-              <option value="Reservation">Reservation</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <input type="text" class="form-control" name="note" placeholder="Note">
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Rental</button>
-      </form>
-      <hr>
-      <h4>All Rentals</h4>
-      <table class="table table-bordered" id="rentalsTable">
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Car</th>
-            <th>Rental Date</th>
-            <th>Return Date</th>
-            <th>Rental Fee</th>
-            <th>Customer</th>
-            <th>Type</th>
-            <th>Note</th>
-            <th>Rating</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      </div>
     </div>
     
     <!-- Data Tab -->
@@ -392,6 +527,79 @@
   </div>
 </div>
 
+<!-- Modal for Extending a Rental -->
+<div class="modal fade" id="extendRentalModal" tabindex="-1" role="dialog" aria-labelledby="extendRentalModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="extendRentalForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="extendRentalModalLabel">Extend Rental</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="rentalId" id="extendRentalId">
+          <div class="form-group">
+            <label for="extendReturnDate">New Return Date & Time</label>
+            <input type="datetime-local" class="form-control" name="newReturnDate" id="extendReturnDate" required>
+          </div>
+          <div class="form-group">
+            <label for="extendReason">Reason for Extension</label>
+            <textarea class="form-control" name="reason" id="extendReason" rows="2" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="extendFee">Additional Fee</label>
+            <input type="number" class="form-control" name="additionalFee" id="extendFee" step="0.01" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Extend Rental</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Adding Notes to a Rental -->
+<div class="modal fade" id="addNotesModal" tabindex="-1" role="dialog" aria-labelledby="addNotesModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="addNotesForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addNotesModalLabel">Add Notes to Rental</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="rentalId" id="notesRentalId">
+          <div class="form-group">
+            <label for="noteContent">Note</label>
+            <textarea class="form-control" name="noteContent" id="noteContent" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="noteImages">Images</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="noteImages" name="images" multiple accept="image/*">
+              <label class="custom-file-label" for="noteImages">Choose images...</label>
+            </div>
+            <small class="form-text text-muted">You can select multiple images</small>
+          </div>
+          <div id="imagePreview" class="mt-3 row">
+            <!-- Image previews will be added here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Notes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- jQuery, Popper.js, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -465,34 +673,90 @@
   // Load active rentals for Dashboard with progress bars and End Early buttons.
   function loadActiveRentals() {
     $.get('/api/rentals/active', function(rentals) {
-      let rentalHtml = '<h4 class="mt-4">Active Rentals</h4>';
+      let rentalHtml = '';
       if (rentals.length === 0) {
-        rentalHtml += '<p>No active rentals.</p>';
+        rentalHtml = '<div class="p-4 text-center text-muted">No active rentals</div>';
       } else {
-        rentalHtml += '<div class="list-group">';
-        const now = new Date().getTime();
-        rentals.forEach(function(rental) {
-          const rentalStart = new Date(rental.rentalDate).getTime();
-          const rentalEnd = new Date(rental.returnDate).getTime();
-          const progress = Math.min(100, Math.round(((now - rentalStart) / (rentalEnd - rentalStart)) * 100));
-          const ended = now >= rentalEnd;
-          rentalHtml += `<div class="list-group-item">
-            <h5>${rental.car ? rental.car.make + ' ' + rental.car.model + ' (' + rental.car.year + ')' : 'N/A'}</h5>
-            <p>Rental Period: ${new Date(rental.rentalDate).toLocaleDateString()} - ${new Date(rental.returnDate).toLocaleDateString()}</p>
-            <div class="progress mb-2">
-              <div class="progress-bar ${ended ? 'bg-danger' : 'bg-success'}" role="progressbar" style="width: ${progress}%;" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
-                ${progress}%
+        rentals.forEach(rental => {
+          const now = new Date().getTime();
+          const start = new Date(rental.rentalDate).getTime();
+          const end = new Date(rental.returnDate).getTime();
+          const progress = Math.min(100, Math.round(((now - start) / (end - start)) * 100));
+          const isCompleted = now >= end;
+          
+          // Calculate time remaining only if not completed
+          let timeRemainingHtml = '';
+          if (!isCompleted) {
+            const timeLeft = end - now;
+            const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            
+            timeRemainingHtml = `
+              <small class="text-${timeLeft < 86400000 ? 'danger' : 'info'}">
+                Time Remaining: ${daysLeft}d ${hoursLeft}h ${minutesLeft}m
+              </small>`;
+          }
+          
+          rentalHtml += `
+            <div class="rental-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5>${rental.car ? rental.car.make + ' ' + rental.car.model + ' (' + rental.car.year + ')' : 'N/A'}</h5>
+                <span class="badge badge-${progress >= 100 ? 'danger' : 'success'}">
+                  ${progress >= 100 ? 'Completed' : 'Active'}
+                </span>
               </div>
-            </div>
-            <button class="btn btn-sm btn-warning end-early-btn" data-id="${rental._id}" ${ended ? 'disabled' : ''}>End Early</button>
-            ${ended ? '<span class="badge badge-danger ml-2">Rental Ended</span>' : ''}
-          </div>`;
+              <div class="rental-details">
+                <p class="mb-1">
+                  <i class="far fa-user mr-2"></i>${rental.customerName}
+                </p>
+                <p class="mb-1">
+                  <i class="far fa-clock mr-2"></i>Start: ${new Date(rental.rentalDate).toLocaleString('en-GB')}
+                </p>
+                <p class="mb-2">
+                  <i class="far fa-clock mr-2"></i>End: ${new Date(rental.returnDate).toLocaleString('en-GB')}
+                </p>
+                ${timeRemainingHtml}
+              </div>
+              <div class="progress mt-2 mb-2">
+                <div class="progress-bar ${progress >= 100 ? 'bg-danger' : 'bg-success'}" 
+                     role="progressbar" 
+                     style="width: ${progress}%;" 
+                     aria-valuenow="${progress}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                  ${progress}%
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="btn-group">
+                  ${isCompleted ? `
+                    <button class="btn btn-sm btn-danger clear-rental-btn" data-id="${rental._id}" data-completed="true">
+                      Clear Rental
+                    </button>
+                    <button class="btn btn-sm btn-info extend-rental-btn" data-id="${rental._id}">
+                      Extend
+                    </button>
+                    <button class="btn btn-sm btn-secondary add-notes-btn" data-id="${rental._id}">
+                      Add Notes
+                    </button>
+                  ` : `
+                    <button class="btn btn-sm btn-warning end-early-btn" data-id="${rental._id}">
+                      End Early
+                    </button>
+                    <button class="btn btn-sm btn-info extend-rental-btn" data-id="${rental._id}">
+                      Extend
+                    </button>
+                    <button class="btn btn-sm btn-secondary add-notes-btn" data-id="${rental._id}">
+                      Add Notes
+                    </button>
+                  `}
+                </div>
+              </div>
+            </div>`;
         });
-        rentalHtml += '</div>';
       }
-      $('#dashboardContent').append(rentalHtml);
-    }).fail(function() {
-      alert('Failed to load active rentals.');
+      $('#activeRentalsContent').html(rentalHtml);
     });
   }
   
@@ -522,16 +786,147 @@
         });
         availableHtml += '</ul>';
       }
-      $('#dashboardContent').html(availableHtml);
+      $('#availableCarsContent').html(availableHtml);
     }).fail(function() {
-      $('#dashboardContent').html('<p class="text-danger">Failed to load available cars.</p>');
+      $('#availableCarsContent').html('<p class="text-danger">Failed to load available cars.</p>');
     });
   }
   
   // Load Dashboard (available cars and active rentals)
   function loadDashboard() {
-    loadAvailableCars();
-    loadActiveRentals();
+    console.log('Loading dashboard...'); // Debug log
+    
+    // Load cars and rentals
+    $.when(
+        $.get('/api/cars'),
+        $.get('/api/rentals/active')
+    ).done(function(carsResponse, rentalsResponse) {
+        console.log('Data received:', { cars: carsResponse[0], rentals: rentalsResponse[0] }); // Debug log
+        
+        const cars = carsResponse[0];
+        const activeRentals = rentalsResponse[0];
+        
+        // Get IDs of cars that are currently rented
+        const rentedCarIds = activeRentals.map(rental => rental.car._id);
+        
+        // Filter available cars (not in active rentals)
+        const availableCars = cars.filter(car => !rentedCarIds.includes(car._id));
+        
+        // Update stats
+        $('#totalFleet').text(cars.length);
+        $('#activeRentals').text(activeRentals.length);
+        $('#availableCars').text(availableCars.length);
+
+        // Update available cars list
+        let availableCarsHtml = '';
+        if (availableCars.length === 0) {
+            availableCarsHtml = '<div class="alert alert-info">No cars available at the moment</div>';
+        } else {
+            availableCarsHtml = '<div class="list-group">';
+            availableCars.forEach(car => {
+                availableCarsHtml += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">${car.make} ${car.model} (${car.year})</h5>
+                                <small class="text-muted">Mileage: ${car.mileage} km</small>
+                            </div>
+                            <button class="btn btn-sm btn-success rent-btn" data-id="${car._id}">
+                                Rent Now
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            availableCarsHtml += '</div>';
+        }
+        $('#availableCarsContent').html(availableCarsHtml);
+
+        // Update active rentals list
+        let activeRentalsHtml = '';
+        if (activeRentals.length === 0) {
+            activeRentalsHtml = '<div class="alert alert-info">No active rentals at the moment</div>';
+        } else {
+            activeRentalsHtml = '<div class="list-group">';
+            activeRentals.forEach(rental => {
+                const now = new Date().getTime();
+                const start = new Date(rental.rentalDate).getTime();
+                const end = new Date(rental.returnDate).getTime();
+                const progress = Math.min(100, Math.round(((now - start) / (end - start)) * 100));
+                const isCompleted = now >= end;
+                
+                // Calculate time remaining only if not completed
+                let timeRemainingHtml = '';
+                if (!isCompleted) {
+                    const timeLeft = end - now;
+                    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    timeRemainingHtml = `
+                        <small class="text-${timeLeft < 86400000 ? 'danger' : 'info'}">
+                            Time Remaining: ${daysLeft}d ${hoursLeft}h ${minutesLeft}m
+                        </small>`;
+                }
+                
+                activeRentalsHtml += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">${rental.car.make} ${rental.car.model} (${rental.car.year})</h5>
+                            <span class="badge badge-${isCompleted ? 'danger' : 'success'}">
+                                ${isCompleted ? 'Completed' : 'Active'}
+                            </span>
+                        </div>
+                        <p class="mb-2">
+                            <strong>Customer:</strong> ${rental.customerName}<br>
+                            <strong>Start:</strong> ${new Date(rental.rentalDate).toLocaleString('en-GB')}<br>
+                            <strong>End:</strong> ${new Date(rental.returnDate).toLocaleString('en-GB')}
+                        </p>
+                        <div class="progress mb-2">
+                            <div class="progress-bar ${isCompleted ? 'bg-danger' : 'bg-success'}" 
+                                role="progressbar" 
+                                style="width: ${progress}%;" 
+                                aria-valuenow="${progress}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                                ${progress}%
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            ${timeRemainingHtml}
+                            <div class="btn-group">
+                                ${isCompleted ? `
+                                    <button class="btn btn-sm btn-danger clear-rental-btn" data-id="${rental._id}" data-completed="true">
+                                        Clear Rental
+                                    </button>
+                                    <button class="btn btn-sm btn-info extend-rental-btn" data-id="${rental._id}">
+                                        Extend
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary add-notes-btn" data-id="${rental._id}">
+                                        Add Notes
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-sm btn-warning end-early-btn" data-id="${rental._id}">
+                                        End Early
+                                    </button>
+                                    <button class="btn btn-sm btn-info extend-rental-btn" data-id="${rental._id}">
+                                        Extend
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary add-notes-btn" data-id="${rental._id}">
+                                        Add Notes
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            activeRentalsHtml += '</div>';
+        }
+        $('#activeRentalsContent').html(activeRentalsHtml);
+    }).fail(function(error) {
+        console.error('Error loading dashboard:', error);
+        $('#availableCarsContent').html('<div class="alert alert-danger">Failed to load available cars</div>');
+        $('#activeRentalsContent').html('<div class="alert alert-danger">Failed to load active rentals</div>');
+    });
   }
   
   // Load all rentals for the Rentals tab table.
@@ -629,15 +1024,27 @@
     // Handle Add Rental form submission
     $('#addRentalForm').submit(function(e) {
       e.preventDefault();
-      const formData = $(this).serialize();
-      $.post('/api/rentals', formData, function(response) {
-        alert('Rental added successfully!');
-        $('#addRentalForm')[0].reset();
-        loadActiveRentals(); // refresh active rentals on Dashboard
-        loadRentals();       // refresh All Rentals table
-      }).fail(function() {
-        alert('Error adding rental.');
+      const formData = $(this).serializeArray();
+      const rentalData = {};
+      
+      formData.forEach(item => {
+        if (item.name === 'rentalDate' || item.name === 'returnDate') {
+          rentalData[item.name] = new Date(item.value).toISOString();
+        } else {
+          rentalData[item.name] = item.value;
+        }
       });
+      
+      $.post('/api/rentals', rentalData)
+        .done(function() {
+          $('#addRentalModal').modal('hide');
+          $(this)[0].reset();
+          loadDashboard();
+          alert('Rental created successfully!');
+        })
+        .fail(function() {
+          alert('Error creating rental');
+        });
     });
     
     // Delegate click event for the "End Early" button in active rentals or rentals table
@@ -693,6 +1100,133 @@
       });
     });
     
+    // Handle Clear Rental button click
+    $(document).on('click', '.clear-rental-btn', function() {
+        const rentalId = $(this).data('id');
+        const isCompleted = $(this).data('completed');
+        
+        if (!isCompleted) {
+            alert('Cannot clear an active rental. The rental must be completed first.');
+            return;
+        }
+        
+        if (confirm('Are you sure you want to clear this rental from the dashboard? The rental data will still be available in reports.')) {
+            $.ajax({
+                url: `/api/rentals/${rentalId}/clear`,
+                method: 'POST',
+                success: function() {
+                    loadDashboard();
+                    alert('Rental cleared from dashboard successfully');
+                },
+                error: function(xhr) {
+                    alert('Error clearing rental: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                }
+            });
+        }
+    });
+
+    // Handle Extend Rental button click
+    $(document).on('click', '.extend-rental-btn', function() {
+        const rentalId = $(this).data('id');
+        $('#extendRentalId').val(rentalId);
+        $('#extendRentalModal').modal('show');
+    });
+
+    // Handle Extend Rental form submission
+    $('#extendRentalForm').submit(function(e) {
+        e.preventDefault();
+        const rentalId = $('#extendRentalId').val();
+        const formData = $(this).serialize();
+        
+        $.ajax({
+            url: `/api/rentals/${rentalId}/extend`,
+            method: 'POST',
+            data: formData,
+            success: function() {
+                $('#extendRentalModal').modal('hide');
+                loadDashboard();
+                alert('Rental extended successfully');
+            },
+            error: function() {
+                alert('Error extending rental');
+            }
+        });
+    });
+    
+    // Handle Add Notes button click
+    $(document).on('click', '.add-notes-btn', function() {
+        const rentalId = $(this).data('id');
+        $('#notesRentalId').val(rentalId);
+        $('#noteContent').val('');
+        $('#noteImages').val('');
+        $('#imagePreview').empty();
+        $('#addNotesModal').modal('show');
+    });
+
+    // Handle file input change for image preview
+    $('#noteImages').change(function() {
+        const files = Array.from(this.files);
+        $('#imagePreview').empty();
+        
+        files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').append(`
+                        <div class="col-md-4 mb-2">
+                            <img src="${e.target.result}" class="img-thumbnail" style="height: 100px; object-fit: cover;">
+                        </div>
+                    `);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Update file input label
+        $(this).next('.custom-file-label').html(
+            files.length > 1 ? `${files.length} files selected` : files[0].name
+        );
+    });
+
+    // Handle Notes form submission
+    $('#addNotesForm').submit(function(e) {
+        e.preventDefault();
+        const rentalId = $('#notesRentalId').val();
+        const formData = new FormData(this);
+        
+        $.ajax({
+            url: `/api/rentals/${rentalId}/notes`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function() {
+                $('#addNotesModal').modal('hide');
+                loadDashboard();
+                alert('Notes added successfully');
+            },
+            error: function() {
+                alert('Error adding notes');
+            }
+        });
+    });
+
+    // Add CSS for button group spacing
+    $('<style>')
+        .text(`
+            .btn-group .btn {
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+            .btn-group .btn:first-child {
+                margin-left: 0;
+            }
+            .btn-group .btn:last-child {
+                margin-right: 0;
+            }
+        `)
+        .appendTo('head');
+
     // Initial load of Dashboard on page load
     loadDashboard();
   });

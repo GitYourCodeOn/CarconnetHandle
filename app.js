@@ -43,13 +43,15 @@ const startServer = async () => {
         app.use(express.static(path.join(__dirname, 'public')));
 
         // Routes
-        const carsRoutes = require('./routes/car');
+        const carsRoutes = require('./routes/cars');
         const rentalsRoutes = require('./routes/rentals');
         const adminRoutes = require('./routes/admin');
+        const remindersRoutes = require('./routes/reminders');
 
         app.use('/api/cars', carsRoutes);
         app.use('/api/rentals', rentalsRoutes);
         app.use('/api/admin', adminRoutes);
+        app.use('/api/reminders', remindersRoutes);
 
         // Serve index.html for all other routes (SPA support)
         app.get('*', (req, res) => {
@@ -62,13 +64,47 @@ const startServer = async () => {
             res.status(500).json({ error: 'Something broke!' });
         });
 
-        // Start the Server
-        const PORT = process.env.PORT || 3000;
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+        // Start the Server with fallback ports
+        const startOnPort = (port) => {
+            return new Promise((resolve, reject) => {
+                const server = app.listen(port, () => {
+                    console.log(`Server running on port ${port}`);
+                    resolve(server);
+                });
+                
+                server.on('error', (err) => {
+                    if (err.code === 'EADDRINUSE') {
+                        console.log(`Port ${port} is already in use, trying another port...`);
+                        reject(err);
+                    } else {
+                        reject(err);
+                    }
+                });
+            });
+        };
+        
+        // Try alternative ports if 3000 is in use
+        const tryPorts = async () => {
+            const ports = [3000, 3001, 3002, 3003, 3004, 3005];
+            
+            for (const port of ports) {
+                try {
+                    return await startOnPort(port);
+                } catch (err) {
+                    if (err.code === 'EADDRINUSE' && ports.indexOf(port) < ports.length - 1) {
+                        // Try the next port
+                        continue;
+                    }
+                    throw err;
+                }
+            }
+            
+            throw new Error('All ports are in use');
+        };
+        
+        await tryPorts();
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        console.error('Server error:', error);
         process.exit(1);
     }
 };

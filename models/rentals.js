@@ -1,6 +1,13 @@
 // models/Rental.js
 const mongoose = require('mongoose');
 
+const DocumentSchema = new mongoose.Schema({
+  name: String,
+  url: String,
+  contentType: String,
+  uploadDate: { type: Date, default: Date.now }
+});
+
 const RentalSchema = new mongoose.Schema({
   car: { type: mongoose.Schema.Types.ObjectId, ref: 'Car' },
   rentalDate: { type: Date, required: true },
@@ -16,7 +23,8 @@ const RentalSchema = new mongoose.Schema({
   comment: String,
   reason: String,
   active: { type: Boolean, default: true },
-  clearedFromDashboard: { type: Boolean, default: false }
+  clearedFromDashboard: { type: Boolean, default: false },
+  documents: [DocumentSchema]
 });
 
 module.exports = mongoose.model('Rental', RentalSchema);

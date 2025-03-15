@@ -1,6 +1,20 @@
 // models/Car.js
 const mongoose = require('mongoose');
 
+const DocumentSchema = new mongoose.Schema({
+  name: String,
+  url: String,
+  contentType: String,
+  uploadDate: { type: Date, default: Date.now }
+});
+
+const ReminderSchema = new mongoose.Schema({
+  type: { type: String, enum: ['service', 'tax', 'insurance', 'tireChange', 'registration', 'custom'] },
+  date: Date,
+  message: String,
+  completed: { type: Boolean, default: false }
+});
+
 const CarSchema = new mongoose.Schema({
   make: {
     type: String,
@@ -24,25 +38,28 @@ const CarSchema = new mongoose.Schema({
     required: [true, 'Mileage is required'],
     min: [0, 'Mileage cannot be negative']
   },
-  serviceDue: {
-    type: Date,
-    required: [true, 'Service due date is required']
+  registration: String,
+  owner: {
+    name: String,
+    contact: String,
+    email: String
   },
+  notes: String,
+  isRented: {
+    type: Boolean,
+    default: false
+  },
+  serviceDue: Date,
   tireChangeDate: Date,
   registrationDate: Date,
   taxDate: Date,
+  insuranceDate: Date,
   customReminder: {
     message: String,
     date: Date
   },
-  isDeleted: {
-    type: Boolean,
-    default: false
-  },
-  isRented: {
-    type: Boolean,
-    default: false
-  }
+  reminders: [ReminderSchema],
+  documents: [DocumentSchema]
 }, {
   timestamps: true
 });

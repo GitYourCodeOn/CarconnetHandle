@@ -3,15 +3,66 @@ const express = require('express');
 const router = express.Router();
 const Rental = require('../models/rentals');
 const Car = require('../models/car');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// POST /api/rentals - Add a new rental
-router.post('/', async (req, res) => {
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    const uploadDir = path.join(__dirname, '../public/uploads');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function(req, file, cb) {
+    // Create unique filename with timestamp and original extension
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, 'document-' + uniqueSuffix + ext);
+  }
+});
+
+// Filter to only allow image files
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// POST /api/rentals - Add a new rental with document uploads
+router.post('/', upload.array('documents', 10), async (req, res) => {
   try {
     const {
       car, rentalDate, returnDate, rentalFee,
       customerName, customerReg, customerEmail,
       customerNumber, rentalType, note
     } = req.body;
+    
+    // Process uploaded documents if any
+    const documents = [];
+    if (req.files && req.files.length > 0) {
+      req.files.forEach(file => {
+        documents.push({
+          name: file.originalname,
+          url: `/uploads/${file.filename}`,
+          contentType: file.mimetype
+        });
+      });
+    }
+    
     const newRental = new Rental({
       car,
       rentalDate,
@@ -22,7 +73,8 @@ router.post('/', async (req, res) => {
       customerEmail,
       customerNumber,
       rentalType,
-      note
+      note,
+      documents
     });
     await newRental.save();
     
@@ -35,6 +87,99 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/rentals/:id/documents - Get documents for a specific rental
+router.get('/:id/documents', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rental = await Rental.findById(id);
+    
+    if (!rental) {
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    
+    res.json(rental.documents || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/rentals/:id/documents - Add documents to an existing rental
+router.post('/:id/documents', upload.array('documents', 10), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rental = await Rental.findById(id);
+    
+    if (!rental) {
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    
+    // Process uploaded documents
+    const newDocuments = [];
+    if (req.files && req.files.length > 0) {
+      req.files.forEach(file => {
+        newDocuments.push({
+          name: file.originalname,
+          url: `/uploads/${file.filename}`,
+          contentType: file.mimetype
+        });
+      });
+      
+      // Add new documents to the rental
+      rental.documents = rental.documents || [];
+      rental.documents.push(...newDocuments);
+      await rental.save();
+      
+      res.json({ 
+        message: 'Documents added successfully', 
+        documents: newDocuments 
+      });
+    } else {
+      res.status(400).json({ error: 'No documents uploaded' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/rentals/:id/documents/:docId - Delete a specific document
+router.delete('/:id/documents/:docId', async (req, res) => {
+  try {
+    const { id, docId } = req.params;
+    const rental = await Rental.findById(id);
+    
+    if (!rental) {
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    
+    // Find the document
+    const docIndex = rental.documents.findIndex(doc => doc._id.toString() === docId);
+    
+    if (docIndex === -1) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+    
+    // Get the document URL to delete the file
+    const docUrl = rental.documents[docIndex].url;
+    const filePath = path.join(__dirname, '../public', docUrl);
+    
+    // Remove from array
+    rental.documents.splice(docIndex, 1);
+    await rental.save();
+    
+    // Delete the file if it exists
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    res.json({ message: 'Document deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -57,7 +202,7 @@ router.get('/active', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const rentals = await Rental.find()
-      .populate('car', 'make model')
+      .populate('car', 'make model year')
       .sort({ rentalDate: -1 });
     res.json(rentals);
   } catch (err) {

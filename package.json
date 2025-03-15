@@ -5,16 +5,21 @@
   "main": "app.js",
   "scripts": {
     "start": "NODE_NO_WARNINGS=1 node app.js",
-    "dev": "NODE_NO_WARNINGS=1 ./node_modules/.bin/nodemon app.js"
+    "dev": "NODE_NO_WARNINGS=1 ./node_modules/.bin/nodemon app.js",
+    "cleanup": "node scripts/cleanupServers.js",
+    "fix-dates": "node scripts/fixInvalidDates.js",
+    "clean-start": "npm run cleanup && npm start",
+    "clean-dev": "npm run cleanup && npm run dev"
   },
   "dependencies": {
     "body-parser": "^1.20.0",
-    "express": "^4.18.0",
-    "mongoose": "^6.0.0",
-    "helmet": "^7.1.0",
     "cors": "^2.8.5",
-    "express-rate-limit": "^7.1.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.0",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "mongoose": "^6.0.0",
+    "multer": "^1.4.5-lts.1",
     "winston": "^3.11.0"
   },
   "devDependencies": {

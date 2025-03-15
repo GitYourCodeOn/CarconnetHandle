@@ -1422,26 +1422,26 @@
           </button>
         </div>
         <div class="modal-body">
+          <!-- Error message area -->
+          <div id="noteError" class="alert alert-danger" style="display: none;"></div>
+          
           <input type="hidden" name="rentalId" id="notesRentalId">
+          
           <div class="form-group">
-            <label for="noteContent">Note</label>
-            <textarea class="form-control" name="noteContent" id="noteContent" rows="3" required></textarea>
+            <label for="noteContent">Note Content</label>
+            <textarea class="form-control" name="noteContent" id="noteContent" rows="4" required></textarea>
+            <small class="form-text text-muted">Enter the details you want to add as a note</small>
           </div>
+          
           <div class="form-group">
-            <label for="noteImages">Images</label>
-            <div class="custom-file">
-              <input type="file" class="custom-file-input" id="noteImages" name="images" multiple accept="image/*">
-              <label class="custom-file-label" for="noteImages">Choose images...</label>
-            </div>
-            <small class="form-text text-muted">You can select multiple images</small>
-          </div>
-          <div id="imagePreview" class="mt-3 row">
-            <!-- Image previews will be added here -->
+            <label for="author">Author (Optional)</label>
+            <input type="text" class="form-control" id="author" name="author" placeholder="Your name">
+            <small class="form-text text-muted">Leave blank to use 'User' as the default</small>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save Notes</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Note</button>
         </div>
       </form>
     </div>
@@ -1498,6 +1498,32 @@
   // ---------------------------
   // Utility Functions
   // ---------------------------
+  
+  // Show alert messages to the user
+  function showAlert(message, type = 'info') {
+    // Create alert HTML
+    const alertHtml = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    `;
+    
+    // Create alert container if it doesn't exist
+    if (!$('#alertContainer').length) {
+      $('body').append('<div id="alertContainer" style="position: fixed; top: 70px; right: 20px; z-index: 9999; width: 300px;"></div>');
+    }
+    
+    // Add alert to container
+    const $alert = $(alertHtml).appendTo('#alertContainer');
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      $alert.alert('close');
+    }, 5000);
+  }
   
   // Compute the color class based on the soonest upcoming reminder.
   function getReminderColor(car) {
@@ -2600,8 +2626,9 @@
         const rentalId = $(this).data('id');
         $('#notesRentalId').val(rentalId);
         $('#noteContent').val('');
-        $('#noteImages').val('');
-        $('#imagePreview').empty();
+        $('#author').val('');
+        // Clear any previous error messages
+        $('#noteError').hide();
         $('#addNotesModal').modal('show');
     });
 
@@ -2630,50 +2657,94 @@
         );
     });
 
-    // Handle Notes form submission
+    // Handle Notes form submission - FIXED VERSION
     $('#addNotesForm').submit(function(e) {
         e.preventDefault();
-        const rentalId = $('#notesRentalId').val();
-        const formData = new FormData(this);
+        console.log("Form submitted");
         
+        const rentalId = $('#notesRentalId').val();
+        const noteContent = $('#noteContent').val().trim();
+        const author = $('#author').val().trim() || 'User';
+        
+        console.log("Form data:", { rentalId, noteContent, author });
+        
+        // Validate the note content
+        if (!noteContent) {
+            $('#noteError').text('Please enter a note').show();
+            return;
+        }
+        
+        // Create FormData
+        const formData = new FormData();
+        formData.append('noteContent', noteContent);
+        formData.append('author', author);
+        
+        console.log("Sending data to:", `/api/rentals/${rentalId}/notes`);
+        
+        // Disable the submit button and show loading state
+        const submitButton = $(this).find('button[type="submit"]');
+        const originalText = submitButton.text();
+        submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        
+        // Submit the note using AJAX
         $.ajax({
             url: `/api/rentals/${rentalId}/notes`,
             method: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function() {
-                $('#addNotesModal').modal('hide');
-                loadDashboard();
-                alert('Notes added successfully');
+            success: function(response) {
+                console.log("Response:", response);
+                if (response.success) {
+                    // Clear the form
+                    $('#noteContent').val('');
+                    $('#author').val('');
+                    
+                    // Close the modal
+                    $('#addNotesModal').modal('hide');
+                    
+                    // Show success alert
+                    showAlert('Note added successfully', 'success');
+                    
+                    // Refresh data
+                    if ($('#rentalsTab').hasClass('active')) {
+                        loadRentals();
+                    } else if ($('#dataTab').hasClass('active')) {
+                        loadData();
+                    } else {
+                        loadDashboard();
+                    }
+                } else {
+                    $('#noteError').text(response.message || 'Error adding note').show();
+                }
             },
-            error: function() {
-                alert('Error adding notes');
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                console.error("Status:", status);
+                console.error("Response:", xhr.responseText);
+                
+                let errorMsg = 'Error adding note. Please try again.';
+                
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMsg = response.message;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing error response:", e);
+                }
+                
+                $('#noteError').text(errorMsg).show();
+            },
+            complete: function() {
+                // Reset button state
+                submitButton.prop('disabled', false).text(originalText);
             }
         });
-    });
-
-    // Handle View Notes button click
-    $(document).on('click', '.view-notes-btn', function() {
-        const notes = $(this).data('notes');
-        
-        if (!notes || notes.trim() === '') {
-            $('#notesContent').html('<p class="text-muted">No notes available for this rental.</p>');
-        } else {
-            // Format notes with line breaks
-            const formattedNotes = notes.split('\n').map(line => {
-                // Check if it's a timestamp line (starts with [date])
-                if (line.match(/^\[\d{1,2}\/\d{1,2}\/\d{4}/)) {
-                    return `<p class="mb-2"><strong>${line}</strong></p>`;
-                } else {
-                    return `<p class="mb-2">${line}</p>`;
-                }
-            }).join('');
-            
-            $('#notesContent').html(formattedNotes);
-        }
-        
-        $('#viewNotesModal').modal('show');
     });
 
     // Add CSS for button group spacing
@@ -4435,6 +4506,93 @@
   function formatDate(date) {
     return new Date(date).toLocaleString('en-GB');
   }
+
+  // Handle View Notes button click
+  $(document).on('click', '.view-notes-btn', function() {
+    const rentalId = $(this).data('id');
+    
+    // Show loading indicator
+    $('#notesContent').html('<div class="text-center"><div class="spinner-border" role="status"></div><p class="mt-2">Loading notes...</p></div>');
+    $('#viewNotesModal').modal('show');
+    
+    console.log('Fetching notes for rental:', rentalId);
+    
+    // Fetch notes from API
+    $.ajax({
+      url: `/api/rentals/${rentalId}/notes`,
+      type: 'GET',
+      success: function(response) {
+        console.log('Notes response:', response);
+        
+        const notes = Array.isArray(response) ? response : [];
+        
+        if (!notes || notes.length === 0) {
+          $('#notesContent').html('<p class="text-muted text-center">No notes available for this rental.</p>');
+        } else {
+          // Format notes with timestamps and authors
+          let notesHtml = '';
+          
+          notes.forEach(note => {
+            const timestamp = new Date(note.timestamp).toLocaleString('en-GB');
+            notesHtml += `
+              <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                  <strong>${note.author || 'User'}</strong>
+                  <small class="text-muted">${timestamp}</small>
+                </div>
+                <div class="card-body">
+                  <p class="card-text">${note.content}</p>
+                </div>
+              </div>
+            `;
+          });
+          
+          $('#notesContent').html(notesHtml);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading notes:', error);
+        console.error('Status:', status);
+        console.error('Response:', xhr.responseText);
+        
+        let errorMsg = 'Error loading notes. Please try again.';
+        
+        try {
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMsg = xhr.responseJSON.message;
+          } else if (xhr.responseText) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.message) {
+              errorMsg = response.message;
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing error response:', e);
+        }
+        
+        $('#notesContent').html(`<div class="alert alert-danger">${errorMsg}</div>`);
+      }
+    });
+  });
+
+  // Handle Add Notes button click
+  $(document).on('click', '.add-notes-btn', function() {
+    const rentalId = $(this).data('id');
+    $('#notesRentalId').val(rentalId);
+    $('#noteContent').val('');
+    // Clear any previous error messages
+    $('#noteError').hide();
+    $('#addNotesModal').modal('show');
+  });
+
+  // Final initialization
+  $(document).ready(function() {
+    // Initial data load
+    loadDashboard();
+    
+    // Set up event handlers for tabs
+    setupTabHandlers();
+  });
 </script>
 </body>
 </html>

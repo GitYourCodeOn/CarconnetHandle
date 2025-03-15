@@ -8,6 +8,13 @@ const DocumentSchema = new mongoose.Schema({
   uploadDate: { type: Date, default: Date.now }
 });
 
+// Add a dedicated schema for notes
+const NoteSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+  author: { type: String, default: 'User' },
+  timestamp: { type: Date, default: Date.now }
+});
+
 const RentalSchema = new mongoose.Schema({
   car: { type: mongoose.Schema.Types.ObjectId, ref: 'Car' },
   rentalDate: { type: Date, required: true },
@@ -18,7 +25,8 @@ const RentalSchema = new mongoose.Schema({
   customerEmail: String,
   customerNumber: String,
   rentalType: { type: String, enum: ['Rental', 'Reservation'], default: 'Rental' },
-  note: String,
+  note: String, // Keep legacy note field for backward compatibility
+  notes: [NoteSchema], // New structured notes array
   rating: String,
   comment: String,
   reason: String,

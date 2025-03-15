@@ -42,6 +42,9 @@ const upload = multer({
   }
 });
 
+// Setup a simpler multer middleware for form data without files
+const formParser = multer().none();
+
 // POST /api/rentals - Add a new rental with document uploads
 router.post('/', upload.array('documents', 10), async (req, res) => {
   try {
@@ -307,31 +310,141 @@ router.post('/:id/extend', async (req, res) => {
 });
 
 // POST /api/rentals/:id/notes - Add notes to a rental
-router.post('/:id/notes', async (req, res) => {
+router.post('/:id/notes', formParser, async (req, res) => {
   try {
     const { id } = req.params;
-    const { noteContent } = req.body;
+    const { noteContent, author } = req.body;
     
+    console.log('Received note request:', {
+      id,
+      body: req.body,
+      contentType: req.headers['content-type'],
+      noteContent,
+      author
+    });
+    
+    if (!noteContent) {
+      console.log('Missing note content');
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Note content is required' 
+      });
+    }
+
     const rental = await Rental.findById(id);
     if (!rental) {
-      return res.status(404).json({ error: 'Rental not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Rental not found' 
+      });
     }
     
-    // Add the new note to existing notes
-    const newNote = `[${new Date().toLocaleString()}] ${noteContent}`;
+    // Create new structured note
+    const newNote = {
+      content: noteContent,
+      author: author || 'User',
+      timestamp: new Date()
+    };
+    
+    // Initialize notes array if it doesn't exist
+    if (!rental.notes) {
+      rental.notes = [];
+    }
+    
+    // Add the new note to the beginning of the notes array
+    rental.notes.unshift(newNote);
+    
+    // Also update legacy note field for backward compatibility
+    const legacyNote = `[${new Date().toLocaleString()}] ${noteContent}`;
     rental.note = rental.note 
-      ? `${rental.note}\n${newNote}` 
-      : newNote;
+      ? `${legacyNote}\n${rental.note}`
+      : legacyNote;
     
     await rental.save();
     
     res.json({ 
-      message: 'Notes added successfully', 
-      rental 
+      success: true,
+      message: 'Note added successfully', 
+      note: newNote
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error('Error adding note:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error adding note: ' + err.message 
+    });
+  }
+});
+
+// GET /api/rentals/:id/notes - Get all notes for a rental
+router.get('/:id/notes', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log('Fetching notes for rental:', id);
+    
+    const rental = await Rental.findById(id);
+    if (!rental) {
+      console.log('Rental not found:', id);
+      return res.status(404).json({ 
+        success: false,
+        message: 'Rental not found' 
+      });
+    }
+    
+    // If structured notes exist, return them
+    if (rental.notes && rental.notes.length > 0) {
+      console.log(`Found ${rental.notes.length} structured notes`);
+      return res.json(rental.notes);
+    }
+    
+    // If no structured notes but has legacy note, convert it
+    if (rental.note) {
+      console.log('Converting legacy notes to structured format');
+      // Create structured notes from legacy note
+      const legacyNotes = [];
+      
+      // Try to parse the legacy note (formatted as "[date] content")
+      const noteLines = rental.note.split('\n');
+      
+      noteLines.forEach(line => {
+        const match = line.match(/^\[(.*?)\] (.*)/);
+        if (match) {
+          try {
+            const timestamp = new Date(match[1]);
+            const content = match[2];
+            
+            if (!isNaN(timestamp.getTime())) {
+              legacyNotes.push({
+                content,
+                timestamp,
+                author: 'System (Migrated)'
+              });
+              return;
+            }
+          } catch (e) { /* If parsing fails, fall through to default */ }
+        }
+        
+        // Default case if parsing fails
+        legacyNotes.push({
+          content: line,
+          timestamp: new Date(),
+          author: 'System (Migrated)'
+        });
+      });
+      
+      return res.json(legacyNotes);
+    }
+    
+    // No notes
+    console.log('No notes found for rental:', id);
+    return res.json([]);
+  } catch (err) {
+    console.error('Error fetching notes:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching notes: ' + err.message 
+    });
   }
 });
 

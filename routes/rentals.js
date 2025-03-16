@@ -468,4 +468,41 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// POST /api/rentals/:id/complete - Complete a rental
+router.post('/:id/complete', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find the rental
+    const rental = await Rental.findById(id);
+    if (!rental) {
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    
+    // Mark as completed
+    rental.active = false;
+    rental.returnDate = new Date();
+    
+    // Add a note about completion
+    if (Array.isArray(rental.notes)) {
+      rental.notes.push({
+        content: 'Rental completed early by user',
+        date: new Date()
+      });
+    }
+    
+    // Save the updated rental
+    await rental.save();
+    
+    res.json({
+      success: true,
+      message: 'Rental completed successfully'
+    });
+    
+  } catch (err) {
+    console.error('Error completing rental:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

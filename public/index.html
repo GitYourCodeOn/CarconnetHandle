@@ -2676,9 +2676,38 @@
 
     // Handle Extend Rental button click
     $(document).on('click', '.extend-rental-btn', function() {
-        const rentalId = $(this).data('id');
-        $('#extendRentalId').val(rentalId);
-        $('#extendRentalModal').modal('show');
+      const rentalId = $(this).data('id');
+      
+      // Show confirmation dialog
+      if (confirm('Are you sure you want to complete this rental? Once completed, you can create a new rental for the same customer if needed.')) {
+        // Show loading state on the button
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        // Complete the rental
+        $.ajax({
+          url: `/api/rentals/${rentalId}/complete`,
+          method: 'POST',
+          success: function(response) {
+            console.log('Rental completed successfully');
+            
+            // Navigate to the rentals tab
+            $('.nav-tabs a[href="#rentalsTab"]').tab('show');
+            
+            // Reload data
+            loadRentals();
+            loadDashboard();
+            
+            alert('Rental completed successfully. You can now create a new rental for this customer if needed.');
+          },
+          error: function(xhr) {
+            console.error('Error completing rental:', xhr.responseText);
+            alert('Failed to complete rental: ' + (xhr.responseJSON?.error || 'Unknown error'));
+            
+            // Re-enable the button
+            $(this).prop('disabled', false).html('Extend');
+          }
+        });
+      }
     });
 
     // Handle Extend Rental form submission

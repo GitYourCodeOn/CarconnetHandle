@@ -408,6 +408,23 @@
                   </div>
                 </div>
               </div>
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Custom Reminder</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" name="customReminderTitle" placeholder="e.g., Change ownership, Renew permit">
+                      <div class="input-group-append">
+                        <span class="input-group-text">Due Date</span>
+                      </div>
+                      <input type="date" class="form-control" name="customReminderDate">
+                    </div>
+                    <small class="text-muted">Add a custom reminder for this car with a specific due date</small>
+                  </div>
+                </div>
+              </div>
+              
               <small class="text-muted">You can add or edit reminders later from the car details page.</small>
             </div>
           </div>
@@ -473,195 +490,211 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="editCarForm" enctype="multipart/form-data">
-              <input type="hidden" id="editCarId" name="carId">
-              
-              <ul class="nav nav-tabs" id="carDetailsTabs">
-                <li class="nav-item">
-                  <a class="nav-link active" data-toggle="tab" href="#basicInfoTab">Basic Info</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#remindersTab">Reminders</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="tab" href="#documentsTab">Documents</a>
-                </li>
-              </ul>
-              
-              <div class="tab-content mt-3">
-                <div class="tab-pane fade show active" id="basicInfoTab">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Make</label>
-                        <input type="text" class="form-control" id="editMake" name="make" required>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Model</label>
-                        <input type="text" class="form-control" id="editModel" name="model" required>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Year</label>
-                        <input type="number" class="form-control" id="editYear" name="year" required>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Registration</label>
-                        <input type="text" class="form-control" id="editRegistration" name="registration">
-                      </div>
-                    </div>
+            <input type="hidden" id="editCarId" name="carId">
+            
+            <ul class="nav nav-tabs" id="carDetailsTabs">
+              <li class="nav-item">
+                <a class="nav-link active" id="car-details-tab" data-toggle="tab" href="#basicInfoTab">Car Details</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="reminders-tab" data-toggle="tab" href="#remindersTab">Reminders</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="documents-tab" data-toggle="tab" href="#documentsTab">Documents</a>
+              </li>
+            </ul>
+            
+            <div class="tab-content mt-3">
+              <div class="tab-pane fade show active" id="basicInfoTab">
+                <div class="card mb-3 car-details-view">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0">Vehicle Information</h5>
                   </div>
-                  
-                  <div class="row">
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Mileage</label>
-                        <input type="number" class="form-control" id="editMileage" name="mileage" required>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Owner Name</label>
-                        <input type="text" class="form-control" id="editOwnerName" name="ownerName">
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Owner Contact</label>
-                        <input type="text" class="form-control" id="editOwnerContact" name="ownerContact">
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group">
-                        <label>Owner Email</label>
-                        <input type="email" class="form-control" id="editOwnerEmail" name="ownerEmail">
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="form-group mt-3">
-                    <label>Basic Info Notes</label>
-                    <textarea class="form-control" id="editNotes" name="notes" rows="3" placeholder="Enter any additional information about this car..."></textarea>
-                  </div>
-                  
-                  <div class="card mt-3">
-                    <div class="card-header bg-light">
-                      <h5 class="mb-0">Quick Reminder</h5>
-                    </div>
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label>Reminder Message</label>
-                            <input type="text" class="form-control" id="quickReminderMessage" placeholder="Enter reminder message...">
-                          </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Make:</strong></label>
+                          <p id="carDetailsMake" class="mb-1">-</p>
                         </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label>Due Date</label>
-                            <input type="date" class="form-control" id="quickReminderDate">
-                          </div>
-                        </div>
-                        <div class="col-md-2">
-                          <div class="form-group">
-                            <label>&nbsp;</label>
-                            <button type="button" class="btn btn-primary btn-block" id="addQuickReminderBtn">Add</button>
-                          </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Model:</strong></label>
+                          <p id="carDetailsModel" class="mb-1">-</p>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div class="card mt-3">
-                    <div class="card-header bg-light">
-                      <h5 class="mb-0">Owner Information</h5>
+                    
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Year:</strong></label>
+                          <p id="carDetailsYear" class="mb-1">-</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Registration:</strong></label>
+                          <p id="carDetailsRegistration" class="mb-1">-</p>
+                        </div>
+                      </div>
                     </div>
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label><i class="fas fa-user mr-2"></i>Name</label>
-                            <p class="form-control-static" id="ownerNameDisplay">-</p>
-                          </div>
+                    
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Mileage:</strong></label>
+                          <p id="carDetailsMileage" class="mb-1">-</p>
                         </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label><i class="fas fa-phone mr-2"></i>Contact</label>
-                            <p class="form-control-static" id="ownerContactDisplay">-</p>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label><i class="fas fa-envelope mr-2"></i>Email</label>
-                            <p class="form-control-static" id="ownerEmailDisplay">-</p>
-                          </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label><strong>Colour:</strong></label>
+                          <p id="carDetailsColor" class="mb-1">-</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div class="tab-pane fade" id="remindersTab">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5>Car Reminders</h5>
-                    <button type="button" class="btn btn-sm btn-primary" id="addCarReminderBtn">
-                      <i class="fas fa-plus-circle"></i> Add Reminder
-                    </button>
+                <div class="card mt-3 car-details-view">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0">Owner Information</h5>
                   </div>
-                  
-                  <div class="table-responsive">
-                    <table class="table table-striped table-hover" id="carRemindersTable">
-                      <thead>
-                        <tr>
-                          <th>Title</th>
-                          <th>Category</th>
-                          <th>Due Date</th>
-                          <th>Priority</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <!-- Car-specific reminders will be loaded here -->
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <div class="alert alert-info mt-3">
-                    <i class="fas fa-info-circle"></i> These reminders will also appear in the main Reminders tab where you can manage all reminders in one place.
-                  </div>
-                </div>
-                
-                <div class="tab-pane fade" id="documentsTab">
-                  <div class="form-group">
-                    <label>Upload New Documents</label>
-                    <div class="custom-file">
-                      <input type="file" class="custom-file-input" id="editCarDocuments" name="documents" multiple accept="image/*,application/pdf">
-                      <label class="custom-file-label" for="editCarDocuments">Choose documents...</label>
-                    </div>
-                  </div>
-                  
-                  <div class="row mt-3">
-                    <div class="col-md-12">
-                      <h5>Existing Documents</h5>
-                      <div id="existingDocumentsContainer" class="row">
-                        <!-- Existing documents will be loaded here -->
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label><i class="fas fa-user mr-2"></i><strong>Name:</strong></label>
+                          <p id="carDetailsOwnerName" class="mb-1">-</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label><i class="fas fa-phone mr-2"></i><strong>Contact:</strong></label>
+                          <p id="carDetailsOwnerContact" class="mb-1">-</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label><i class="fas fa-envelope mr-2"></i><strong>Email:</strong></label>
+                          <p id="carDetailsOwnerEmail" class="mb-1">-</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                
+                <div class="card mt-3 car-details-view">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0">Notes</h5>
+                  </div>
+                  <div class="card-body">
+                    <p id="carDetailsNotes" class="mb-0">-</p>
+                  </div>
+                </div>
               </div>
               
-              <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <div class="tab-pane fade" id="remindersTab">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5>Car Reminders</h5>
+                  <button type="button" class="btn btn-sm btn-primary" id="addCarReminderBtn">
+                    <i class="fas fa-plus-circle"></i> Add Reminder
+                  </button>
+                </div>
+                
+                <!-- Custom Reminder Form -->
+                <div class="card mb-3">
+                  <div class="card-header bg-light">
+                    <h6 class="mb-0">Add Custom Reminder</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="form-row">
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="customReminderTitle">Title</label>
+                          <input type="text" class="form-control" id="customReminderTitle" placeholder="e.g., Change ownership, Renew permit">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="customReminderDate">Due Date</label>
+                          <input type="date" class="form-control" id="customReminderDate">
+                        </div>
+                      </div>
+                      <div class="col-md-2">
+                        <div class="form-group">
+                          <label for="customReminderPriority">Priority</label>
+                          <select class="form-control" id="customReminderPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-2">
+                        <div class="form-group">
+                          <label>&nbsp;</label>
+                          <button type="button" class="btn btn-primary btn-block" id="saveCustomReminderBtn">Save</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover" id="carRemindersTable">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Car-specific reminders will be loaded here -->
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                  <i class="fas fa-info-circle"></i> These reminders will also appear in the main Reminders tab where you can manage all reminders in one place.
+                </div>
               </div>
-            </form>
+              
+              <div class="tab-pane fade" id="documentsTab">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5>Documents</h5>
+                  <button type="button" class="btn btn-sm btn-primary" id="addCarDocumentBtn">
+                    <i class="fas fa-plus-circle"></i> Add Document
+                  </button>
+                </div>
+                
+                <div class="form-group d-none" id="documentUploadForm">
+                  <label>Upload New Documents</label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="carDocumentsUpload" name="documents" multiple accept="image/*,application/pdf">
+                    <label class="custom-file-label" for="carDocumentsUpload">Choose documents...</label>
+                  </div>
+                  <div class="mt-2">
+                    <button type="button" class="btn btn-success btn-sm" id="uploadDocumentsBtn">Upload</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="cancelUploadBtn">Cancel</button>
+                  </div>
+                </div>
+                
+                <div class="row mt-3" id="existingDocumentsContainer">
+                  <!-- Existing documents will be loaded here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="editCarDetailsBtn">Edit</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -2383,16 +2416,48 @@
     });
     
     // Handle Add Car form submission
-    $('#addCarForm').submit(function(e){
+    $(document).on('submit', '#addCarForm', function(e) {
       e.preventDefault();
-      const formData = $(this).serialize();
-      $.post('/api/cars', formData, function(response) {
-        alert('Car added successfully!');
-        $('#addCarForm')[0].reset();
-        loadCars();       // refresh Cars tab and update dropdowns
-        loadDashboard();  // refresh Dashboard available cars
-      }).fail(function() {
-        alert('Error adding car.');
+      
+      // ... existing code ...
+      
+      // Check if custom reminder was added
+      const customReminderTitle = $('input[name="customReminderTitle"]').val().trim();
+      const customReminderDate = $('input[name="customReminderDate"]').val();
+      
+      // Create FormData object
+      const formData = new FormData(this);
+      
+      // Submit the form
+      $.ajax({
+        url: '/api/cars',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          console.log('Car added successfully:', response);
+          
+          // If custom reminder was provided, create it
+          if (customReminderTitle && customReminderDate) {
+            ReminderManager.createReminder({
+              title: customReminderTitle,
+              date: customReminderDate,
+              type: 'car',
+              category: 'custom',
+              carId: response._id
+            });
+          }
+          
+          // Reset form and refresh data
+          $('#addCarForm')[0].reset();
+          updateCarsTable();
+          showAlert('Car added successfully', 'success');
+        },
+        error: function(xhr, status, error) {
+          console.error('Error adding car:', error);
+          showAlert('Failed to add car: ' + (xhr.responseJSON?.message || error), 'danger');
+        }
       });
     });
     
@@ -3146,7 +3211,7 @@
             <td class="${reminderClass}">${reminderStatus}</td>
             <td>${documentsCount > 0 ? `${documentsCount} document(s)` : 'None'}</td>
             <td>
-              <button class="btn btn-sm btn-info view-car-btn" data-id="${car._id}">View/Edit</button>
+              <button class="btn btn-sm btn-info view-car-btn" data-id="${car._id}">View</button>
               <button class="btn btn-sm btn-danger delete-car-btn" data-id="${car._id}">Delete</button>
             </td>
           </tr>
@@ -3304,45 +3369,7 @@
   // View/Edit Car button click
   $(document).on('click', '.view-car-btn', function() {
     const carId = $(this).data('id');
-    
-    // Fetch car details
-    $.get(`/api/cars/${carId}`, function(car) {
-      // Populate form fields
-      $('#editCarId').val(car._id);
-      $('#editMake').val(car.make);
-      $('#editModel').val(car.model);
-      $('#editYear').val(car.year);
-      $('#editMileage').val(car.mileage);
-      $('#editRegistration').val(car.registration || '');
-      
-      // Owner information
-      $('#editOwnerName').val(car.owner ? car.owner.name || '' : '');
-      $('#editOwnerContact').val(car.owner ? car.owner.contact || '' : '');
-      $('#editOwnerEmail').val(car.owner ? car.owner.email || '' : '');
-      
-      // Update owner information display
-      updateOwnerInfoDisplay(car);
-      
-      // Notes
-      $('#editNotes').val(car.notes || '');
-      
-      // Set default date for quick reminder to tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      $('#quickReminderDate').val(tomorrow.toISOString().split('T')[0]);
-      
-      // Load car-specific reminders
-      loadCarReminders(car._id);
-      
-      // Load documents
-      loadCarDocuments(car);
-      
-      // Show modal
-      $('#carDetailsModal').modal('show');
-    }).fail(function(error) {
-      console.error('Error fetching car details:', error);
-      alert('Failed to load car details');
-    });
+    loadCarDetails(carId);
   });
   
   // Load reminders for a specific car
@@ -3407,9 +3434,9 @@
           </tr>
         `);
       });
-    }).fail(function(error) {
+    }).fail(function(xhr, status, error) {
       console.error('Error loading car reminders:', error);
-      $('#carRemindersTable tbody').html('<tr><td colspan="6" class="text-center">Failed to load reminders</td></tr>');
+      $('#carRemindersTable tbody').html('<tr><td colspan="6" class="text-center text-danger">Error loading reminders</td></tr>');
     });
   }
   
@@ -3745,7 +3772,7 @@
     });
   });
   
-  // Delete Document button click
+  // Handle delete document button click
   $(document).on('click', '.delete-document-btn', function() {
     if (!confirm('Are you sure you want to delete this document?')) {
       return;
@@ -3754,20 +3781,26 @@
     const docId = $(this).data('id');
     const carId = $('#editCarId').val();
     
+    // Show loading state
+    const $btn = $(this);
+    const originalHtml = $btn.html();
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+    
+    // Send delete request
     $.ajax({
       url: `/api/cars/${carId}/documents/${docId}`,
-      type: 'DELETE',
+      method: 'DELETE',
       success: function(response) {
-        alert('Document deleted successfully');
+        showAlert('Document deleted successfully', 'success');
         
-        // Refresh car details
+        // Reload car documents
         $.get(`/api/cars/${carId}`, function(car) {
           loadCarDocuments(car);
         });
       },
-      error: function(error) {
-        console.error('Error deleting document:', error);
-        alert('Failed to delete document: ' + (error.responseJSON ? error.responseJSON.error : 'Unknown error'));
+      error: function(xhr, status, error) {
+        showAlert('Error deleting document: ' + (xhr.responseJSON?.error || error), 'danger');
+        $btn.prop('disabled', false).html(originalHtml);
       }
     });
   });
@@ -4608,6 +4641,522 @@
     
     // Set up event handlers for tabs
     setupTabHandlers();
+  });
+
+  // Centralized Reminder Management System
+  const ReminderManager = {
+    // Create a new reminder
+    createReminder: function(reminderData, callback) {
+      // Validate required fields
+      if (!reminderData.title || !reminderData.date) {
+        console.error('Missing required fields for reminder');
+        if (callback) callback({ success: false, message: 'Title and date are required' });
+        return;
+      }
+      
+      // Set default values if not provided
+      const reminder = {
+        title: reminderData.title,
+        description: reminderData.description || '',
+        date: reminderData.date,
+        type: reminderData.type || 'other',
+        category: reminderData.category || 'custom',
+        priority: reminderData.priority || 'medium',
+        carId: reminderData.carId || null,
+        notes: reminderData.notes || ''
+      };
+      
+      // Send to server
+      $.ajax({
+        url: '/api/reminders',
+        method: 'POST',
+        data: reminder,
+        success: function(response) {
+          console.log('Reminder created successfully:', response);
+          
+          // Refresh relevant views
+          if (reminder.carId) {
+            loadCarReminders(reminder.carId);
+          }
+          loadReminders();
+          loadUpcomingReminders();
+          
+          if (callback) callback({ success: true, reminder: response });
+        },
+        error: function(xhr, status, error) {
+          console.error('Error creating reminder:', error);
+          if (callback) callback({ success: false, message: xhr.responseJSON?.message || 'Failed to create reminder' });
+        }
+      });
+    },
+    
+    // Update an existing reminder
+    updateReminder: function(reminderId, reminderData, callback) {
+      $.ajax({
+        url: `/api/reminders/${reminderId}`,
+        method: 'PUT',
+        data: reminderData,
+        success: function(response) {
+          console.log('Reminder updated successfully:', response);
+          
+          // Refresh relevant views
+          if (reminderData.carId) {
+            loadCarReminders(reminderData.carId);
+          }
+          loadReminders();
+          loadUpcomingReminders();
+          
+          if (callback) callback({ success: true, reminder: response });
+        },
+        error: function(xhr, status, error) {
+          console.error('Error updating reminder:', error);
+          if (callback) callback({ success: false, message: xhr.responseJSON?.message || 'Failed to update reminder' });
+        }
+      });
+    },
+    
+    // Delete a reminder
+    deleteReminder: function(reminderId, carId, callback) {
+      $.ajax({
+        url: `/api/reminders/${reminderId}`,
+        method: 'DELETE',
+        success: function(response) {
+          console.log('Reminder deleted successfully:', response);
+          
+          // Refresh relevant views
+          if (carId) {
+            loadCarReminders(carId);
+          }
+          loadReminders();
+          loadUpcomingReminders();
+          
+          if (callback) callback({ success: true });
+        },
+        error: function(xhr, status, error) {
+          console.error('Error deleting reminder:', error);
+          if (callback) callback({ success: false, message: xhr.responseJSON?.message || 'Failed to delete reminder' });
+        }
+      });
+    },
+    
+    // Toggle reminder completion status
+    toggleReminderStatus: function(reminderId, completed, carId, callback) {
+      $.ajax({
+        url: `/api/reminders/${reminderId}/toggle`,
+        method: 'PUT',
+        success: function(response) {
+          console.log('Reminder status updated successfully:', response);
+          
+          // Refresh relevant views
+          if (carId) {
+            loadCarReminders(carId);
+          }
+          loadReminders();
+          loadUpcomingReminders();
+          
+          if (callback) callback({ success: true, reminder: response });
+        },
+        error: function(xhr, status, error) {
+          console.error('Error updating reminder status:', error);
+          if (callback) callback({ success: false, message: xhr.responseJSON?.message || 'Failed to update reminder status' });
+        }
+      });
+    }
+  };
+
+  // Function to load car details
+  function loadCarDetails(carId) {
+    $.get(`/api/cars/${carId}`, function(car) {
+      // Populate the car details in the modal
+      $('#carDetailsTitle').text(`${car.make} ${car.model} (${car.year})`);
+      
+      // Basic car information
+      $('#carDetailsMake').text(car.make || '-');
+      $('#carDetailsModel').text(car.model || '-');
+      $('#carDetailsYear').text(car.year || '-');
+      $('#carDetailsRegistration').text(car.registration || '-');
+      $('#carDetailsMileage').text(car.mileage ? car.mileage.toLocaleString() : '-');
+      $('#carDetailsColor').text(car.color || '-');
+      
+      // Owner information
+      $('#carDetailsOwnerName').text(car.owner && car.owner.name ? car.owner.name : '-');
+      $('#carDetailsOwnerContact').text(car.owner && car.owner.contact ? car.owner.contact : '-');
+      $('#carDetailsOwnerEmail').text(car.owner && car.owner.email ? car.owner.email : '-');
+      
+      // Notes
+      $('#carDetailsNotes').text(car.notes || 'No notes available.');
+      
+      // Store car ID for operations
+      $('#editCarId').val(car._id);
+      
+      // Load car-specific reminders
+      loadCarReminders(car._id);
+      
+      // Load documents
+      loadCarDocuments(car);
+      
+      // Show the modal
+      $('#carDetailsModal').modal('show');
+      
+      // Ensure the first tab is active
+      $('#car-details-tab').tab('show');
+    }).fail(function(error) {
+      console.error('Error loading car details:', error);
+      showAlert('Error loading car details', 'danger');
+    });
+  }
+  
+  // Function to load car-specific reminders
+  function loadCarReminders(carId) {
+    $.get(`/api/reminders?carId=${carId}`, function(reminders) {
+      const tableBody = $('#carRemindersTable tbody');
+      tableBody.empty();
+      
+      if (reminders.length === 0) {
+        tableBody.append('<tr><td colspan="6" class="text-center">No reminders found</td></tr>');
+        return;
+      }
+      
+      reminders.forEach(reminder => {
+        const dueDate = new Date(reminder.date).toLocaleDateString('en-GB');
+        const status = reminder.completed ? 'Completed' : 'Pending';
+        const statusClass = reminder.completed ? 'text-success' : 'text-warning';
+        const priorityClass = {
+          'low': 'text-info',
+          'medium': 'text-primary',
+          'high': 'text-danger'
+        }[reminder.priority] || 'text-primary';
+        
+        tableBody.append(`
+          <tr data-id="${reminder._id}">
+            <td>${reminder.title}</td>
+            <td>${reminder.category || 'Custom'}</td>
+            <td>${dueDate}</td>
+            <td><span class="${priorityClass}">${reminder.priority || 'Medium'}</span></td>
+            <td><span class="${statusClass}">${status}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary toggle-reminder-status" 
+                data-id="${reminder._id}" data-completed="${reminder.completed}">
+                ${reminder.completed ? 'Mark Incomplete' : 'Mark Complete'}
+              </button>
+              <button class="btn btn-sm btn-outline-danger delete-reminder" data-id="${reminder._id}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `);
+      });
+    }).fail(function(xhr, status, error) {
+      console.error('Error loading car reminders:', error);
+      $('#carRemindersTable tbody').html('<tr><td colspan="6" class="text-center text-danger">Error loading reminders</td></tr>');
+    });
+  }
+  
+  // Handle toggle reminder status
+  $(document).on('click', '.toggle-reminder-status', function() {
+    const reminderId = $(this).data('id');
+    const currentStatus = $(this).data('completed') === true;
+    const carId = $('#editCarId').val();
+    
+    ReminderManager.toggleReminderStatus(reminderId, !currentStatus, carId);
+  });
+  
+  // Handle delete reminder
+  $(document).on('click', '.delete-reminder', function() {
+    if (confirm('Are you sure you want to delete this reminder?')) {
+      const reminderId = $(this).data('id');
+      const carId = $('#editCarId').val();
+      
+      ReminderManager.deleteReminder(reminderId, carId);
+    }
+  });
+
+  // Handle Add Document button click
+  $(document).on('click', '#addCarDocumentBtn', function() {
+    $('#documentUploadForm').removeClass('d-none');
+    $(this).addClass('d-none');
+  });
+  
+  // Handle Cancel Upload button click
+  $(document).on('click', '#cancelUploadBtn', function() {
+    $('#documentUploadForm').addClass('d-none');
+    $('#addCarDocumentBtn').removeClass('d-none');
+    $('#carDocumentsUpload').val('');
+    $('.custom-file-label').text('Choose documents...');
+  });
+  
+  // Handle Upload Documents button click
+  $(document).on('click', '#uploadDocumentsBtn', function() {
+    const carId = $('#editCarId').val();
+    const fileInput = $('#carDocumentsUpload')[0];
+    
+    if (!carId) {
+      showAlert('Car ID is missing', 'danger');
+      return;
+    }
+    
+    if (fileInput.files.length === 0) {
+      showAlert('Please select at least one file to upload', 'warning');
+      return;
+    }
+    
+    // Create form data
+    const formData = new FormData();
+    for (let i = 0; i < fileInput.files.length; i++) {
+      formData.append('documents', fileInput.files[i]);
+    }
+    
+    // Show loading indicator
+    $('#uploadDocumentsBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Uploading...');
+    
+    // Upload the files
+    $.ajax({
+      url: `/api/cars/${carId}/documents`,
+      method: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        showAlert('Documents uploaded successfully', 'success');
+        
+        // Reset form
+        $('#documentUploadForm').addClass('d-none');
+        $('#addCarDocumentBtn').removeClass('d-none');
+        $('#carDocumentsUpload').val('');
+        $('.custom-file-label').text('Choose documents...');
+        
+        // Reload car documents
+        $.get(`/api/cars/${carId}`, function(car) {
+          loadCarDocuments(car);
+        });
+      },
+      error: function(xhr, status, error) {
+        showAlert('Error uploading documents: ' + (xhr.responseJSON?.error || error), 'danger');
+      },
+      complete: function() {
+        $('#uploadDocumentsBtn').prop('disabled', false).html('Upload');
+      }
+    });
+  });
+  
+  // Handle Edit Car Details button click
+  $(document).on('click', '#editCarDetailsBtn', function() {
+    const carId = $('#editCarId').val();
+    
+    // Toggle to edit mode within the same modal
+    // Fetch car details again to ensure we have the most recent data
+    $.get(`/api/cars/${carId}`, function(car) {
+      // Hide the view-only content
+      $('.car-details-view').addClass('d-none');
+      
+      // Show the edit form
+      if (!$('#editCarForm').length) {
+        // If the edit form doesn't exist yet, create it
+        const editForm = `
+          <form id="editCarForm" class="car-details-edit" enctype="multipart/form-data">
+            <div class="card mb-3">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Vehicle Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editMake">Make</label>
+                      <input type="text" class="form-control" id="editMake" name="make" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editModel">Model</label>
+                      <input type="text" class="form-control" id="editModel" name="model" required>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editYear">Year</label>
+                      <input type="number" class="form-control" id="editYear" name="year" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editRegistration">Registration</label>
+                      <input type="text" class="form-control" id="editRegistration" name="registration">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editMileage">Mileage</label>
+                      <input type="number" class="form-control" id="editMileage" name="mileage" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editColor">Colour</label>
+                      <input type="text" class="form-control" id="editColor" name="color">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mt-3">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Owner Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="editOwnerName">Name</label>
+                      <input type="text" class="form-control" id="editOwnerName" name="ownerName">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="editOwnerContact">Contact</label>
+                      <input type="text" class="form-control" id="editOwnerContact" name="ownerContact">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="editOwnerEmail">Email</label>
+                      <input type="email" class="form-control" id="editOwnerEmail" name="ownerEmail">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mt-3">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Notes</h5>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <textarea class="form-control" id="editNotes" name="notes" rows="3" placeholder="Enter any additional information about this car..."></textarea>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-3 text-right">
+              <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        `;
+        
+        // Append the edit form after the view content
+        $('#basicInfoTab').append(editForm);
+      } else {
+        // If the form already exists, just show it
+        $('.car-details-edit').removeClass('d-none');
+      }
+      
+      // Populate the form with car data
+      $('#editMake').val(car.make);
+      $('#editModel').val(car.model);
+      $('#editYear').val(car.year);
+      $('#editRegistration').val(car.registration || '');
+      $('#editMileage').val(car.mileage);
+      $('#editColor').val(car.color || '');
+      
+      // Owner information
+      $('#editOwnerName').val(car.owner ? car.owner.name || '' : '');
+      $('#editOwnerContact').val(car.owner ? car.owner.contact || '' : '');
+      $('#editOwnerEmail').val(car.owner ? car.owner.email || '' : '');
+      
+      // Notes
+      $('#editNotes').val(car.notes || '');
+      
+      // Hide the edit button and show a cancel button
+      $('#editCarDetailsBtn').addClass('d-none');
+    }).fail(function(error) {
+      console.error('Error fetching car details for editing:', error);
+      showAlert('Failed to load car details for editing', 'danger');
+    });
+  });
+  
+  // Handle Cancel Edit button click
+  $(document).on('click', '#cancelEditBtn', function() {
+    // Hide the edit form
+    $('.car-details-edit').addClass('d-none');
+    
+    // Show the view-only content
+    $('.car-details-view').removeClass('d-none');
+    
+    // Show the edit button again
+    $('#editCarDetailsBtn').removeClass('d-none');
+  });
+  
+  // Handle Edit Car form submission
+  $(document).on('submit', '#editCarForm', function(e) {
+    e.preventDefault();
+    
+    const carId = $('#editCarId').val();
+    
+    // Create FormData object to handle file uploads
+    const formData = new FormData(this);
+    
+    // Show loading state
+    const $btn = $(this).find('button[type="submit"]');
+    const originalHtml = $btn.html();
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+    
+    // Submit the form
+    $.ajax({
+      url: `/api/cars/${carId}`,
+      method: 'PUT',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        showAlert('Car updated successfully', 'success');
+        
+        // Reload car details with the updated information
+        loadCarDetails(carId);
+        
+        // Refresh the cars table
+        updateCarsTable();
+      },
+      error: function(xhr, status, error) {
+        showAlert('Error updating car: ' + (xhr.responseJSON?.error || error), 'danger');
+        $btn.prop('disabled', false).html(originalHtml);
+      }
+    });
+  });
+
+  // View Car button click
+  $(document).on('click', '.view-car-btn', function() {
+    const carId = $(this).data('id');
+    loadCarDetails(carId);
+  });
+  
+  // Ensure tab navigation works properly
+  $(document).on('click', '#car-details-tab', function(e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+  
+  $(document).on('click', '#reminders-tab', function(e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+  
+  $(document).on('click', '#documents-tab', function(e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+  
+  // Reset modal to default tab when closed
+  $('#carDetailsModal').on('hidden.bs.modal', function() {
+    $('#car-details-tab').tab('show');
   });
 </script>
 </body>

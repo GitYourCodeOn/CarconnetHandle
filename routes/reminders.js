@@ -259,4 +259,49 @@ router.post('/:id/complete', async (req, res) => {
   }
 });
 
+// PUT /api/reminders/:id/toggle - Toggle the completion status of a reminder
+router.put('/:id/toggle', async (req, res) => {
+  try {
+    const reminder = await Reminder.findById(req.params.id);
+    
+    if (!reminder) {
+      return res.status(404).json({ error: 'Reminder not found' });
+    }
+    
+    // Toggle the completed status
+    reminder.completed = !reminder.completed;
+    await reminder.save();
+    
+    // If this is a car reminder, also update the car's internal reminder for backward compatibility
+    if (reminder.carId && reminder.type === 'car') {
+      try {
+        const car = await Car.findById(reminder.carId);
+        if (car) {
+          // Find matching reminder in car's reminders array
+          const carReminder = car.reminders.find(r => 
+            r.message === reminder.title && 
+            new Date(r.date).toDateString() === new Date(reminder.date).toDateString()
+          );
+          
+          if (carReminder) {
+            carReminder.completed = reminder.completed;
+            await car.save();
+          }
+        }
+      } catch (err) {
+        console.error('Error updating car reminder:', err);
+        // Continue with the response even if car update fails
+      }
+    }
+    
+    res.json({ 
+      message: `Reminder marked as ${reminder.completed ? 'completed' : 'incomplete'}`, 
+      reminder 
+    });
+  } catch (err) {
+    console.error('Error toggling reminder status:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router; 

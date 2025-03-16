@@ -38,9 +38,16 @@ const startServer = async () => {
         app.use('/api/', limiter);
 
         // Middleware
-        app.use(bodyParser.urlencoded({ extended: true }));
-        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+        app.use(bodyParser.json({ limit: '10mb' }));
         app.use(express.static(path.join(__dirname, 'public')));
+
+        // Create uploads directory if it doesn't exist
+        const fs = require('fs');
+        const uploadDir = path.join(__dirname, 'public/uploads');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
 
         // Routes
         const carsRoutes = require('./routes/cars');

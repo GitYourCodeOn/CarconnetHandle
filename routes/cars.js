@@ -82,7 +82,8 @@ router.post('/', upload.array('documents', 10), async (req, res) => {
     const {
       make, model, year, mileage, registration,
       ownerName, ownerContact, ownerEmail, notes,
-      serviceDue, taxDate, insuranceDate, tireChangeDate, registrationDate
+      serviceDue, taxDate, insuranceDate, tireChangeDate, registrationDate,
+      customReminderTitle, customReminderDate
     } = req.body;
     
     // Process uploaded documents if any
@@ -137,6 +138,15 @@ router.post('/', upload.array('documents', 10), async (req, res) => {
         type: 'registration',
         date: new Date(registrationDate),
         message: `Registration renewal due for ${make} ${model} (${registration || year})`
+      });
+    }
+    
+    // Add custom reminder if provided
+    if (customReminderTitle && customReminderDate) {
+      reminders.push({
+        type: 'custom',
+        date: new Date(customReminderDate),
+        message: customReminderTitle
       });
     }
     
@@ -353,25 +363,49 @@ router.delete('/:id/documents/:docId', async (req, res) => {
 router.post('/:id/reminders', async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, date, message } = req.body;
+    const { title, date, priority, type = 'custom', category = 'custom' } = req.body;
     
+    // Validate required fields
+    if (!title) {
+      return res.status(400).json({ error: 'Reminder title is required' });
+    }
+    
+    if (!date) {
+      return res.status(400).json({ error: 'Reminder date is required' });
+    }
+    
+    // Validate car exists
     const car = await Car.findById(id);
     if (!car) {
       return res.status(404).json({ error: 'Car not found' });
     }
     
-    // Add the new reminder
+    // Create a new reminder in the centralized system
+    const Reminder = require('../models/reminders');
+    const newReminder = new Reminder({
+      title,
+      date: new Date(date),
+      type: 'car',
+      category,
+      priority: priority || 'medium',
+      carId: id,
+      description: `Custom reminder for ${car.make} ${car.model} (${car.registration || car.year})`
+    });
+    
+    await newReminder.save();
+    
+    // Also add to car's internal reminders for backward compatibility
     car.reminders.push({
       type: type || 'custom',
       date: new Date(date),
-      message
+      message: title
     });
     
     await car.save();
     
-    res.json({ 
+    res.status(201).json({ 
       message: 'Reminder added successfully', 
-      car 
+      reminder: newReminder
     });
   } catch (err) {
     console.error(err);

@@ -54,6 +54,22 @@ router.post('/', upload.array('documents', 10), async (req, res) => {
       customerNumber, rentalType, note
     } = req.body;
     
+    // Check for existing rentals for this car
+    const conflictingRental = await Rental.findOne({
+      car,
+      active: true,
+      $or: [
+        { 
+          rentalDate: { $lt: new Date(returnDate) },
+          returnDate: { $gt: new Date(rentalDate) }
+        }
+      ]
+    });
+
+    if (conflictingRental) {
+      throw new Error('Car already booked for selected dates');
+    }
+    
     // Process uploaded documents if any
     const documents = [];
     if (req.files && req.files.length > 0) {

@@ -112,6 +112,45 @@
       z-index: 9999;
       width: 300px;
     }
+    
+    /* Desktop layout improvements */
+    @media (min-width: 769px) {
+      .container-desktop {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+      }
+      
+      .row-desktop {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+      }
+      
+      .col-desktop {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+      }
+      
+      .col-desktop-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+        padding: 0 15px;
+      }
+      
+      /* Form layout improvements */
+      .form-group-desktop {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      /* Limit the width of tables and cards */
+      .card, .table-responsive {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -148,7 +187,7 @@
     </ul>
   </div>
   
-  <div class="container-fluid">
+  <div class="container-fluid container-desktop">
     <!-- Navigation Tabs (Desktop) -->
     <ul class="nav nav-tabs nav-tabs-scroll mb-3 desktop-tabs d-md-flex" id="mainTabs" role="tablist">
       <li class="nav-item">

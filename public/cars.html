@@ -178,4 +178,113 @@
     </thead>
     <tbody></tbody>
   </table>
+</div>
+
+<!-- Add Car Modal -->
+<div class="modal fade" id="addCarModal" tabindex="-1" role="dialog" aria-labelledby="addCarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="addCarModalLabel">Add New Car</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addCarForm" class="form-group-desktop">
+          <!-- Two-column form layout -->
+          <div class="row row-desktop">
+            <!-- Left column -->
+            <div class="col-12 col-md-6 col-desktop">
+              <div class="form-group">
+                <label for="carMake">Make</label>
+                <input type="text" class="form-control" id="carMake" placeholder="e.g. Toyota, Honda" required>
+              </div>
+              <div class="form-group">
+                <label for="carModel">Model</label>
+                <input type="text" class="form-control" id="carModel" placeholder="e.g. Corolla, Civic" required>
+              </div>
+              <div class="form-group">
+                <label for="carYear">Year</label>
+                <input type="number" class="form-control" id="carYear" placeholder="e.g. 2020" required>
+              </div>
+              <div class="form-group">
+                <label for="carRegistration">Registration</label>
+                <input type="text" class="form-control" id="carRegistration" placeholder="e.g. ABC 123" required>
+              </div>
+            </div>
+            
+            <!-- Right column -->
+            <div class="col-12 col-md-6 col-desktop">
+              <div class="form-group">
+                <label for="carMileage">Mileage</label>
+                <input type="number" class="form-control" id="carMileage" placeholder="Current mileage">
+              </div>
+              <div class="form-group">
+                <label for="carOwnerName">Owner Name</label>
+                <input type="text" class="form-control" id="carOwnerName" placeholder="Full name of the owner">
+              </div>
+              <div class="form-group">
+                <label for="carOwnerContact">Owner Contact</label>
+                <input type="text" class="form-control" id="carOwnerContact" placeholder="Phone number">
+              </div>
+              <div class="form-group">
+                <label for="carOwnerEmail">Owner Email</label>
+                <input type="email" class="form-control" id="carOwnerEmail" placeholder="Email address">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Full-width fields -->
+          <div class="form-group">
+            <label for="carNotes">Notes (e.g., 2 keys, special features)</label>
+            <textarea class="form-control" id="carNotes" rows="3" placeholder="Enter notes about the car"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="carReminders">Reminders (Optional)</label>
+            <select class="form-control" id="carReminders" multiple>
+              <option value="insurance">Insurance Renewal</option>
+              <option value="service">Regular Service</option>
+              <option value="tax">Road Tax</option>
+              <option value="inspection">Vehicle Inspection</option>
+            </select>
+            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple reminders</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="carDocuments">Car Documents (Registration, Insurance, etc.)</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="carDocuments" multiple>
+              <label class="custom-file-label" for="carDocuments">Choose documents...</label>
+            </div>
+            <small class="form-text text-muted">You can select multiple documents (images or PDFs)</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveCarBtn">Save Car</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Car Modal - Similar structure to Add Car Modal -->
+<div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <!-- Edit car modal content will be similar to add car modal -->
+      <!-- Will be populated dynamically when editing a car -->
+    </div>
+  </div>
+</div>
+
+<!-- View Car Details Modal -->
+<div class="modal fade" id="viewCarModal" tabindex="-1" role="dialog" aria-labelledby="viewCarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <!-- View car details content -->
+    </div>
+  </div>
 </div> 

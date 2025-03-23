@@ -2416,50 +2416,50 @@
     });
     
     // Handle Add Car form submission
-    $(document).on('submit', '#addCarForm', function(e) {
-      e.preventDefault();
+    // $(document).on('submit', '#addCarForm', function(e) {
+    //   e.preventDefault();
       
-      // ... existing code ...
+    //   // ... existing code ...
       
-      // Check if custom reminder was added
-      const customReminderTitle = $('input[name="customReminderTitle"]').val().trim();
-      const customReminderDate = $('input[name="customReminderDate"]').val();
+    //   // Check if custom reminder was added
+    //   const customReminderTitle = $('input[name="customReminderTitle"]').val().trim();
+    //   const customReminderDate = $('input[name="customReminderDate"]').val();
       
-      // Create FormData object
-      const formData = new FormData(this);
+    //   // Create FormData object
+    //   const formData = new FormData(this);
       
-      // Submit the form
-      $.ajax({
-        url: '/api/cars',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-          console.log('Car added successfully:', response);
+    //   // Submit the form
+    //   $.ajax({
+    //     url: '/api/cars',
+    //     method: 'POST',
+    //     data: formData,
+    //     processData: false,
+    //     contentType: false,
+    //     success: function(response) {
+    //       console.log('Car added successfully:', response);
           
-          // If custom reminder was provided, create it
-          if (customReminderTitle && customReminderDate) {
-            ReminderManager.createReminder({
-              title: customReminderTitle,
-              date: customReminderDate,
-              type: 'car',
-              category: 'custom',
-              carId: response._id
-            });
-          }
+    //       // If custom reminder was provided, create it
+    //       if (customReminderTitle && customReminderDate) {
+    //         ReminderManager.createReminder({
+    //           title: customReminderTitle,
+    //           date: customReminderDate,
+    //           type: 'car',
+    //           category: 'custom',
+    //           carId: response._id
+    //         });
+    //       }
           
-          // Reset form and refresh data
-          $('#addCarForm')[0].reset();
-          updateCarsTable();
-          showAlert('Car added successfully', 'success');
-        },
-        error: function(xhr, status, error) {
-          console.error('Error adding car:', error);
-          showAlert('Failed to add car: ' + (xhr.responseJSON?.message || error), 'danger');
-        }
-      });
-    });
+    //       // Reset form and refresh data
+    //       $('#addCarForm')[0].reset();
+    //       updateCarsTable();
+    //       showAlert('Car added successfully', 'success');
+    //     },
+    //     error: function(xhr, status, error) {
+    //       console.error('Error adding car:', error);
+    //       showAlert('Failed to add car: ' + (xhr.responseJSON?.message || error), 'danger');
+    //     }
+    //   });
+    // });
     
     // Handle Add Rental form submission
     $('#addRentalForm').submit(function(e) {

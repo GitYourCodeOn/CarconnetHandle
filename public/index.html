@@ -496,12 +496,12 @@
               <li class="nav-item">
                 <a class="nav-link active" id="car-details-tab" data-toggle="tab" href="#basicInfoTab">Car Details</a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a class="nav-link" id="reminders-tab" data-toggle="tab" href="#remindersTab">Reminders</a>
-              </li>
-              <li class="nav-item">
+              </li> -->
+              <!-- <li class="nav-item">
                 <a class="nav-link" id="documents-tab" data-toggle="tab" href="#documentsTab">Documents</a>
-              </li>
+              </li> -->
             </ul>
             
             <div class="tab-content mt-3">
@@ -593,101 +593,6 @@
                   <div class="card-body">
                     <p id="carDetailsNotes" class="mb-0">-</p>
                   </div>
-                </div>
-              </div>
-              
-              <div class="tab-pane fade" id="remindersTab">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5>Car Reminders</h5>
-                  <button type="button" class="btn btn-sm btn-primary" id="addCarReminderBtn">
-                    <i class="fas fa-plus-circle"></i> Add Reminder
-                  </button>
-                </div>
-                
-                <!-- Custom Reminder Form -->
-                <div class="card mb-3">
-                  <div class="card-header bg-light">
-                    <h6 class="mb-0">Add Custom Reminder</h6>
-                  </div>
-                  <div class="card-body">
-                    <div class="form-row">
-                      <div class="col-md-5">
-                        <div class="form-group">
-                          <label for="customReminderTitle">Title</label>
-                          <input type="text" class="form-control" id="customReminderTitle" placeholder="e.g., Change ownership, Renew permit">
-                        </div>
-                      </div>
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label for="customReminderDate">Due Date</label>
-                          <input type="date" class="form-control" id="customReminderDate">
-                        </div>
-                      </div>
-                      <div class="col-md-2">
-                        <div class="form-group">
-                          <label for="customReminderPriority">Priority</label>
-                          <select class="form-control" id="customReminderPriority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-md-2">
-                        <div class="form-group">
-                          <label>&nbsp;</label>
-                          <button type="button" class="btn btn-primary btn-block" id="saveCustomReminderBtn">Save</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="table-responsive">
-                  <table class="table table-striped table-hover" id="carRemindersTable">
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Due Date</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Car-specific reminders will be loaded here -->
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div class="alert alert-info mt-3">
-                  <i class="fas fa-info-circle"></i> These reminders will also appear in the main Reminders tab where you can manage all reminders in one place.
-                </div>
-              </div>
-              
-              <div class="tab-pane fade" id="documentsTab">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5>Documents</h5>
-                  <button type="button" class="btn btn-sm btn-primary" id="addCarDocumentBtn">
-                    <i class="fas fa-plus-circle"></i> Add Document
-                  </button>
-                </div>
-                
-                <div class="form-group d-none" id="documentUploadForm">
-                  <label>Upload New Documents</label>
-                  <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="carDocumentsUpload" name="documents" multiple accept="image/*,application/pdf">
-                    <label class="custom-file-label" for="carDocumentsUpload">Choose documents...</label>
-                  </div>
-                  <div class="mt-2">
-                    <button type="button" class="btn btn-success btn-sm" id="uploadDocumentsBtn">Upload</button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="cancelUploadBtn">Cancel</button>
-                  </div>
-                </div>
-                
-                <div class="row mt-3" id="existingDocumentsContainer">
-                  <!-- Existing documents will be loaded here -->
                 </div>
               </div>
             </div>
@@ -959,27 +864,6 @@
                     <button id="resetReminderFilters" class="btn btn-sm btn-secondary">Reset</button>
                   </div>
                 </div>
-              </div>
-              
-              <!-- Reminders table -->
-              <div class="table-responsive">
-                <table class="table table-striped table-hover" id="remindersTable">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Type</th>
-                      <th>Category</th>
-                      <th>Due Date</th>
-                      <th>Priority</th>
-                      <th>Status</th>
-                      <th>Related To</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Reminders will be loaded here -->
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
@@ -4000,161 +3884,161 @@
 
   // Reminders functionality
   
-  // Load all reminders with optional filtering
-  function loadReminders(filters = {}) {
-    let url = '/api/reminders';
+  // // Load all reminders with optional filtering
+  // function loadReminders(filters = {}) {
+  //   let url = '/api/reminders';
     
-    // Add query parameters for filtering
-    if (Object.keys(filters).length > 0) {
-      const queryParams = new URLSearchParams();
+  //   // Add query parameters for filtering
+  //   if (Object.keys(filters).length > 0) {
+  //     const queryParams = new URLSearchParams();
       
-      if (filters.type && filters.type !== 'all') queryParams.append('type', filters.type);
-      if (filters.category && filters.category !== 'all') queryParams.append('category', filters.category);
-      if (filters.completed !== undefined) queryParams.append('completed', filters.completed);
-      if (filters.carId) queryParams.append('carId', filters.carId);
-      if (filters.search) queryParams.append('search', filters.search);
+  //     if (filters.type && filters.type !== 'all') queryParams.append('type', filters.type);
+  //     if (filters.category && filters.category !== 'all') queryParams.append('category', filters.category);
+  //     if (filters.completed !== undefined) queryParams.append('completed', filters.completed);
+  //     if (filters.carId) queryParams.append('carId', filters.carId);
+  //     if (filters.search) queryParams.append('search', filters.search);
       
-      url += '?' + queryParams.toString();
-    }
+  //     url += '?' + queryParams.toString();
+  //   }
     
-    $.get(url, function(reminders) {
-      // Clear existing table
-      $('#remindersTable tbody').empty();
+  //   $.get(url, function(reminders) {
+  //     // Clear existing table
+  //     $('#remindersTable tbody').empty();
       
-      if (reminders.length === 0) {
-        $('#remindersTable tbody').html('<tr><td colspan="8" class="text-center">No reminders found</td></tr>');
-        return;
-      }
+  //     if (reminders.length === 0) {
+  //       $('#remindersTable tbody').html('<tr><td colspan="8" class="text-center">No reminders found</td></tr>');
+  //       return;
+  //     }
       
-      // Populate reminders table
-      reminders.forEach(reminder => {
-        const dueDate = new Date(reminder.date).toLocaleDateString('en-GB');
-        const now = new Date();
-        const reminderDate = new Date(reminder.date);
+  //     // Populate reminders table
+  //     reminders.forEach(reminder => {
+  //       const dueDate = new Date(reminder.date).toLocaleDateString('en-GB');
+  //       const now = new Date();
+  //       const reminderDate = new Date(reminder.date);
         
-        // Determine status class
-        let statusClass = 'secondary';
-        let statusText = reminder.completed ? 'Completed' : 'Pending';
+  //       // Determine status class
+  //       let statusClass = 'secondary';
+  //       let statusText = reminder.completed ? 'Completed' : 'Pending';
         
-        if (!reminder.completed) {
-          if (reminderDate < now) {
-            statusClass = 'danger';
-            statusText = 'Overdue';
-          } else if (reminderDate < new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)) {
-            statusClass = 'warning';
-            statusText = 'Due Soon';
-          }
-        }
+  //       if (!reminder.completed) {
+  //         if (reminderDate < now) {
+  //           statusClass = 'danger';
+  //           statusText = 'Overdue';
+  //         } else if (reminderDate < new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+  //           statusClass = 'warning';
+  //           statusText = 'Due Soon';
+  //         }
+  //       }
         
-        // Format related to field
-        let relatedTo = 'N/A';
-        if (reminder.carId && reminder.carDetails) {
-          relatedTo = `${reminder.carDetails.make} ${reminder.carDetails.model} (${reminder.carDetails.registration || reminder.carDetails.year})`;
-        }
+  //       // Format related to field
+  //       let relatedTo = 'N/A';
+  //       if (reminder.carId && reminder.carDetails) {
+  //         relatedTo = `${reminder.carDetails.make} ${reminder.carDetails.model} (${reminder.carDetails.registration || reminder.carDetails.year})`;
+  //       }
         
-        // Format priority
-        const priorityClass = {
-          'high': 'danger',
-          'medium': 'warning',
-          'low': 'info'
-        }[reminder.priority] || 'secondary';
+  //       // Format priority
+  //       const priorityClass = {
+  //         'high': 'danger',
+  //         'medium': 'warning',
+  //         'low': 'info'
+  //       }[reminder.priority] || 'secondary';
         
-        // Add row to table
-        $('#remindersTable tbody').append(`
-          <tr>
-            <td>${reminder.title}</td>
-            <td>${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)}</td>
-            <td>${reminder.category.charAt(0).toUpperCase() + reminder.category.slice(1)}</td>
-            <td>${dueDate}</td>
-            <td><span class="badge badge-${priorityClass}">${reminder.priority.charAt(0).toUpperCase() + reminder.priority.slice(1)}</span></td>
-            <td><span class="badge badge-${statusClass}">${statusText}</span></td>
-            <td>${relatedTo}</td>
-            <td>
-              <button class="btn btn-sm btn-info edit-reminder-btn" data-id="${reminder._id}">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn btn-sm btn-success complete-reminder-btn" data-id="${reminder._id}" ${reminder.completed ? 'disabled' : ''}>
-                <i class="fas fa-check"></i>
-              </button>
-              <button class="btn btn-sm btn-danger delete-reminder-btn" data-id="${reminder._id}">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `);
-      });
-    }).fail(function(error) {
-      console.error('Error loading reminders:', error);
-      $('#remindersTable tbody').html('<tr><td colspan="8" class="text-center">Failed to load reminders</td></tr>');
-    });
+  //       // Add row to table
+  //       $('#remindersTable tbody').append(`
+  //         <tr>
+  //           <td>${reminder.title}</td>
+  //           <td>${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)}</td>
+  //           <td>${reminder.category.charAt(0).toUpperCase() + reminder.category.slice(1)}</td>
+  //           <td>${dueDate}</td>
+  //           <td><span class="badge badge-${priorityClass}">${reminder.priority.charAt(0).toUpperCase() + reminder.priority.slice(1)}</span></td>
+  //           <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+  //           <td>${relatedTo}</td>
+  //           <td>
+  //             <button class="btn btn-sm btn-info edit-reminder-btn" data-id="${reminder._id}">
+  //               <i class="fas fa-edit"></i>
+  //             </button>
+  //             <button class="btn btn-sm btn-success complete-reminder-btn" data-id="${reminder._id}" ${reminder.completed ? 'disabled' : ''}>
+  //               <i class="fas fa-check"></i>
+  //             </button>
+  //             <button class="btn btn-sm btn-danger delete-reminder-btn" data-id="${reminder._id}">
+  //               <i class="fas fa-trash"></i>
+  //             </button>
+  //           </td>
+  //         </tr>
+  //       `);
+  //     });
+  //   }).fail(function(error) {
+  //     console.error('Error loading reminders:', error);
+  //     $('#remindersTable tbody').html('<tr><td colspan="8" class="text-center">Failed to load reminders</td></tr>');
+  //   });
     
-    // Load upcoming reminders (next 7 days)
-    loadUpcomingReminders(7, '#upcomingRemindersShort');
+  //   // Load upcoming reminders (next 7 days)
+  //   loadUpcomingReminders(7, '#upcomingRemindersShort');
     
-    // Load this month's reminders
-    loadUpcomingReminders(30, '#upcomingRemindersMonth');
-  }
+  //   // Load this month's reminders
+  //   loadUpcomingReminders(30, '#upcomingRemindersMonth');
+  // }
   
-  // Load upcoming reminders for a specific time period
-  function loadUpcomingReminders(days, containerId) {
-    $.get(`/api/reminders/upcoming?days=${days}`, function(reminders) {
-      const container = $(containerId);
+  // // Load upcoming reminders for a specific time period
+  // function loadUpcomingReminders(days, containerId) {
+  //   $.get(`/api/reminders/upcoming?days=${days}`, function(reminders) {
+  //     const container = $(containerId);
       
-      if (reminders.length === 0) {
-        container.html('<div class="alert alert-info">No upcoming reminders</div>');
-        return;
-      }
+  //     if (reminders.length === 0) {
+  //       container.html('<div class="alert alert-info">No upcoming reminders</div>');
+  //       return;
+  //     }
       
-      let html = '<div class="list-group">';
+  //     let html = '<div class="list-group">';
       
-      reminders.forEach(reminder => {
-        const daysText = reminder.daysRemaining === 1 ? 'day' : 'days';
-        const reminderClass = reminder.daysRemaining <= 3 ? 'list-group-item-danger' : 'list-group-item-warning';
+  //     reminders.forEach(reminder => {
+  //       const daysText = reminder.daysRemaining === 1 ? 'day' : 'days';
+  //       const reminderClass = reminder.daysRemaining <= 3 ? 'list-group-item-danger' : 'list-group-item-warning';
         
-        // Format related to field
-        let relatedTo = '';
-        if (reminder.carId && reminder.carDetails) {
-          relatedTo = `<br><small>Car: ${reminder.carDetails.make} ${reminder.carDetails.model} (${reminder.carDetails.registration || reminder.carDetails.year})</small>`;
-        }
+  //       // Format related to field
+  //       let relatedTo = '';
+  //       if (reminder.carId && reminder.carDetails) {
+  //         relatedTo = `<br><small>Car: ${reminder.carDetails.make} ${reminder.carDetails.model} (${reminder.carDetails.registration || reminder.carDetails.year})</small>`;
+  //       }
         
-        html += `
-          <div class="list-group-item ${reminderClass} d-flex justify-content-between align-items-center">
-            <div>
-              <strong>${reminder.title}</strong>
-              <br>
-              <small>Due date: ${new Date(reminder.date).toLocaleDateString('en-GB')}</small>
-              ${relatedTo}
-            </div>
-            <span class="badge badge-pill badge-warning">${reminder.daysRemaining} ${daysText}</span>
-          </div>
-        `;
-      });
+  //       html += `
+  //         <div class="list-group-item ${reminderClass} d-flex justify-content-between align-items-center">
+  //           <div>
+  //             <strong>${reminder.title}</strong>
+  //             <br>
+  //             <small>Due date: ${new Date(reminder.date).toLocaleDateString('en-GB')}</small>
+  //             ${relatedTo}
+  //           </div>
+  //           <span class="badge badge-pill badge-warning">${reminder.daysRemaining} ${daysText}</span>
+  //         </div>
+  //       `;
+  //     });
       
-      html += '</div>';
-      container.html(html);
-    }).fail(function(error) {
-      console.error('Error loading upcoming reminders:', error);
-      $(containerId).html('<div class="alert alert-danger">Failed to load reminders</div>');
-    });
-  }
+  //     html += '</div>';
+  //     container.html(html);
+  //   }).fail(function(error) {
+  //     console.error('Error loading upcoming reminders:', error);
+  //     $(containerId).html('<div class="alert alert-danger">Failed to load reminders</div>');
+  //   });
+  // }
   
-  // Load cars for the reminder form
-  function loadCarsForReminders() {
-    $.get('/api/cars', function(cars) {
-      // Clear existing options
-      $('#reminderCarId').empty();
+  // // Load cars for the reminder form
+  // function loadCarsForReminders() {
+  //   $.get('/api/cars', function(cars) {
+  //     // Clear existing options
+  //     $('#reminderCarId').empty();
       
-      // Add default option
-      $('#reminderCarId').append('<option value="">-- Select a Car --</option>');
+  //     // Add default option
+  //     $('#reminderCarId').append('<option value="">-- Select a Car --</option>');
       
-      // Add car options
-      cars.forEach(car => {
-        $('#reminderCarId').append(`<option value="${car._id}">${car.make} ${car.model} (${car.registration || car.year})</option>`);
-      });
-    }).fail(function(error) {
-      console.error('Error loading cars for reminders:', error);
-    });
-  }
+  //     // Add car options
+  //     cars.forEach(car => {
+  //       $('#reminderCarId').append(`<option value="${car._id}">${car.make} ${car.model} (${car.registration || car.year})</option>`);
+  //     });
+  //   }).fail(function(error) {
+  //     console.error('Error loading cars for reminders:', error);
+  //   });
+  // }
 
   // Handle view documents button click
   $(document).on('click', '.view-documents-btn', function() {
@@ -4911,138 +4795,138 @@
     });
   }
   
-  // Function to load car-specific reminders
-  function loadCarReminders(carId) {
-    $.get(`/api/reminders?carId=${carId}`, function(reminders) {
-      const tableBody = $('#carRemindersTable tbody');
-      tableBody.empty();
+  // // Function to load car-specific reminders
+  // function loadCarReminders(carId) {
+  //   $.get(`/api/reminders?carId=${carId}`, function(reminders) {
+  //     const tableBody = $('#carRemindersTable tbody');
+  //     tableBody.empty();
       
-      if (reminders.length === 0) {
-        tableBody.append('<tr><td colspan="6" class="text-center">No reminders found</td></tr>');
-        return;
-      }
+  //     if (reminders.length === 0) {
+  //       tableBody.append('<tr><td colspan="6" class="text-center">No reminders found</td></tr>');
+  //       return;
+  //     }
       
-      reminders.forEach(reminder => {
-        const dueDate = new Date(reminder.date).toLocaleDateString('en-GB');
-        const status = reminder.completed ? 'Completed' : 'Pending';
-        const statusClass = reminder.completed ? 'text-success' : 'text-warning';
-        const priorityClass = {
-          'low': 'text-info',
-          'medium': 'text-primary',
-          'high': 'text-danger'
-        }[reminder.priority] || 'text-primary';
+  //     reminders.forEach(reminder => {
+  //       const dueDate = new Date(reminder.date).toLocaleDateString('en-GB');
+  //       const status = reminder.completed ? 'Completed' : 'Pending';
+  //       const statusClass = reminder.completed ? 'text-success' : 'text-warning';
+  //       const priorityClass = {
+  //         'low': 'text-info',
+  //         'medium': 'text-primary',
+  //         'high': 'text-danger'
+  //       }[reminder.priority] || 'text-primary';
         
-        tableBody.append(`
-          <tr data-id="${reminder._id}">
-            <td>${reminder.title}</td>
-            <td>${reminder.category || 'Custom'}</td>
-            <td>${dueDate}</td>
-            <td><span class="${priorityClass}">${reminder.priority || 'Medium'}</span></td>
-            <td><span class="${statusClass}">${status}</span></td>
-            <td>
-              <button class="btn btn-sm btn-outline-primary toggle-reminder-status" 
-                data-id="${reminder._id}" data-completed="${reminder.completed}">
-                ${reminder.completed ? 'Mark Incomplete' : 'Mark Complete'}
-              </button>
-              <button class="btn btn-sm btn-outline-danger delete-reminder" data-id="${reminder._id}">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `);
-      });
-    }).fail(function(xhr, status, error) {
-      console.error('Error loading car reminders:', error);
-      $('#carRemindersTable tbody').html('<tr><td colspan="6" class="text-center text-danger">Error loading reminders</td></tr>');
-    });
-  }
+  //       tableBody.append(`
+  //         <tr data-id="${reminder._id}">
+  //           <td>${reminder.title}</td>
+  //           <td>${reminder.category || 'Custom'}</td>
+  //           <td>${dueDate}</td>
+  //           <td><span class="${priorityClass}">${reminder.priority || 'Medium'}</span></td>
+  //           <td><span class="${statusClass}">${status}</span></td>
+  //           <td>
+  //             <button class="btn btn-sm btn-outline-primary toggle-reminder-status" 
+  //               data-id="${reminder._id}" data-completed="${reminder.completed}">
+  //               ${reminder.completed ? 'Mark Incomplete' : 'Mark Complete'}
+  //             </button>
+  //             <button class="btn btn-sm btn-outline-danger delete-reminder" data-id="${reminder._id}">
+  //               <i class="fas fa-trash"></i>
+  //             </button>
+  //           </td>
+  //         </tr>
+  //       `);
+  //     });
+  //   }).fail(function(xhr, status, error) {
+  //     console.error('Error loading car reminders:', error);
+  //     $('#carRemindersTable tbody').html('<tr><td colspan="6" class="text-center text-danger">Error loading reminders</td></tr>');
+  //   });
+  // }
   
-  // Handle toggle reminder status
-  $(document).on('click', '.toggle-reminder-status', function() {
-    const reminderId = $(this).data('id');
-    const currentStatus = $(this).data('completed') === true;
-    const carId = $('#editCarId').val();
+  // // Handle toggle reminder status
+  // $(document).on('click', '.toggle-reminder-status', function() {
+  //   const reminderId = $(this).data('id');
+  //   const currentStatus = $(this).data('completed') === true;
+  //   const carId = $('#editCarId').val();
     
-    ReminderManager.toggleReminderStatus(reminderId, !currentStatus, carId);
-  });
+  //   ReminderManager.toggleReminderStatus(reminderId, !currentStatus, carId);
+  // });
   
-  // Handle delete reminder
-  $(document).on('click', '.delete-reminder', function() {
-    if (confirm('Are you sure you want to delete this reminder?')) {
-      const reminderId = $(this).data('id');
-      const carId = $('#editCarId').val();
+  // // Handle delete reminder
+  // $(document).on('click', '.delete-reminder', function() {
+  //   if (confirm('Are you sure you want to delete this reminder?')) {
+  //     const reminderId = $(this).data('id');
+  //     const carId = $('#editCarId').val();
       
-      ReminderManager.deleteReminder(reminderId, carId);
-    }
-  });
+  //     ReminderManager.deleteReminder(reminderId, carId);
+  //   }
+  // });
 
-  // Handle Add Document button click
-  $(document).on('click', '#addCarDocumentBtn', function() {
-    $('#documentUploadForm').removeClass('d-none');
-    $(this).addClass('d-none');
-  });
+  // // Handle Add Document button click
+  // $(document).on('click', '#addCarDocumentBtn', function() {
+  //   $('#documentUploadForm').removeClass('d-none');
+  //   $(this).addClass('d-none');
+  // });
   
-  // Handle Cancel Upload button click
-  $(document).on('click', '#cancelUploadBtn', function() {
-    $('#documentUploadForm').addClass('d-none');
-    $('#addCarDocumentBtn').removeClass('d-none');
-    $('#carDocumentsUpload').val('');
-    $('.custom-file-label').text('Choose documents...');
-  });
+  // // Handle Cancel Upload button click
+  // $(document).on('click', '#cancelUploadBtn', function() {
+  //   $('#documentUploadForm').addClass('d-none');
+  //   $('#addCarDocumentBtn').removeClass('d-none');
+  //   $('#carDocumentsUpload').val('');
+  //   $('.custom-file-label').text('Choose documents...');
+  // });
   
-  // Handle Upload Documents button click
-  $(document).on('click', '#uploadDocumentsBtn', function() {
-    const carId = $('#editCarId').val();
-    const fileInput = $('#carDocumentsUpload')[0];
+  // // Handle Upload Documents button click
+  // $(document).on('click', '#uploadDocumentsBtn', function() {
+  //   const carId = $('#editCarId').val();
+  //   const fileInput = $('#carDocumentsUpload')[0];
     
-    if (!carId) {
-      showAlert('Car ID is missing', 'danger');
-      return;
-    }
+  //   if (!carId) {
+  //     showAlert('Car ID is missing', 'danger');
+  //     return;
+  //   }
     
-    if (fileInput.files.length === 0) {
-      showAlert('Please select at least one file to upload', 'warning');
-      return;
-    }
+  //   if (fileInput.files.length === 0) {
+  //     showAlert('Please select at least one file to upload', 'warning');
+  //     return;
+  //   }
     
-    // Create form data
-    const formData = new FormData();
-    for (let i = 0; i < fileInput.files.length; i++) {
-      formData.append('documents', fileInput.files[i]);
-    }
+  //   // Create form data
+  //   const formData = new FormData();
+  //   for (let i = 0; i < fileInput.files.length; i++) {
+  //     formData.append('documents', fileInput.files[i]);
+  //   }
     
-    // Show loading indicator
-    $('#uploadDocumentsBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Uploading...');
+  //   // Show loading indicator
+  //   $('#uploadDocumentsBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Uploading...');
     
-    // Upload the files
-    $.ajax({
-      url: `/api/cars/${carId}/documents`,
-      method: 'POST',
-      data: formData,
-      contentType: false,
-      processData: false,
-      success: function(response) {
-        showAlert('Documents uploaded successfully', 'success');
+  //   // Upload the files
+  //   $.ajax({
+  //     url: `/api/cars/${carId}/documents`,
+  //     method: 'POST',
+  //     data: formData,
+  //     contentType: false,
+  //     processData: false,
+  //     success: function(response) {
+  //       showAlert('Documents uploaded successfully', 'success');
         
-        // Reset form
-        $('#documentUploadForm').addClass('d-none');
-        $('#addCarDocumentBtn').removeClass('d-none');
-        $('#carDocumentsUpload').val('');
-        $('.custom-file-label').text('Choose documents...');
+  //       // Reset form
+  //       $('#documentUploadForm').addClass('d-none');
+  //       $('#addCarDocumentBtn').removeClass('d-none');
+  //       $('#carDocumentsUpload').val('');
+  //       $('.custom-file-label').text('Choose documents...');
         
-        // Reload car documents
-        $.get(`/api/cars/${carId}`, function(car) {
-          loadCarDocuments(car);
-        });
-      },
-      error: function(xhr, status, error) {
-        showAlert('Error uploading documents: ' + (xhr.responseJSON?.error || error), 'danger');
-      },
-      complete: function() {
-        $('#uploadDocumentsBtn').prop('disabled', false).html('Upload');
-      }
-    });
-  });
+  //       // Reload car documents
+  //       $.get(`/api/cars/${carId}`, function(car) {
+  //         loadCarDocuments(car);
+  //       });
+  //     },
+  //     error: function(xhr, status, error) {
+  //       showAlert('Error uploading documents: ' + (xhr.responseJSON?.error || error), 'danger');
+  //     },
+  //     complete: function() {
+  //       $('#uploadDocumentsBtn').prop('disabled', false).html('Upload');
+  //     }
+  //   });
+  // });
   
   // Handle Edit Car Details button click
   $(document).on('click', '#editCarDetailsBtn', function() {
@@ -5269,15 +5153,15 @@
     $(this).tab('show');
   });
   
-  $(document).on('click', '#reminders-tab', function(e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
+  // $(document).on('click', '#reminders-tab', function(e) {
+  //   e.preventDefault();
+  //   $(this).tab('show');
+  // });
   
-  $(document).on('click', '#documents-tab', function(e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
+  // $(document).on('click', '#documents-tab', function(e) {
+  //   e.preventDefault();
+  //   $(this).tab('show');
+  // });
   
   // Reset modal to default tab when closed
   $('#carDetailsModal').on('hidden.bs.modal', function() {

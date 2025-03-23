@@ -1,0 +1,244 @@
+<!-- Marketing Tab -->
+<div id="marketingTab" class="tab-pane">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h3>Marketing Tools</h3>
+      <p class="text-muted">Tools to help you promote your car rental business</p>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Customer Communications</h5>
+        </div>
+        <div class="card-body">
+          <form id="customerEmailForm">
+            <div class="form-group">
+              <label for="emailTemplate">Email Template</label>
+              <select class="form-control" id="emailTemplate">
+                <option value="welcome">Welcome Email</option>
+                <option value="reminder">Rental Reminder</option>
+                <option value="return">Return Confirmation</option>
+                <option value="thanks">Thank You</option>
+                <option value="promotion">Special Promotion</option>
+                <option value="custom">Custom Email</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="emailSubject">Subject</label>
+              <input type="text" class="form-control" id="emailSubject" placeholder="Email subject line">
+            </div>
+            
+            <div class="form-group">
+              <label for="emailContent">Email Content</label>
+              <textarea class="form-control" id="emailContent" rows="6" placeholder="Enter your email message here"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Recipients</label>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="allCustomers" name="recipients" class="custom-control-input" checked>
+                <label class="custom-control-label" for="allCustomers">All Customers</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="activeCustomers" name="recipients" class="custom-control-input">
+                <label class="custom-control-label" for="activeCustomers">Customers with Active Rentals</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="pastCustomers" name="recipients" class="custom-control-input">
+                <label class="custom-control-label" for="pastCustomers">Past Customers (Last 3 Months)</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="selectCustomers" name="recipients" class="custom-control-input">
+                <label class="custom-control-label" for="selectCustomers">Select Specific Customers</label>
+              </div>
+            </div>
+            
+            <div id="customerSelectContainer" class="form-group d-none">
+              <label for="selectedCustomers">Select Customers</label>
+              <select multiple class="form-control" id="selectedCustomers">
+                <!-- Customer list will be populated dynamically -->
+              </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Send Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Promotion Generator</h5>
+        </div>
+        <div class="card-body">
+          <form id="promotionForm">
+            <div class="form-group">
+              <label for="promotionType">Promotion Type</label>
+              <select class="form-control" id="promotionType">
+                <option value="discount">Percentage Discount</option>
+                <option value="fixed">Fixed Amount Discount</option>
+                <option value="freeDay">Free Extra Day</option>
+                <option value="upgrade">Free Upgrade</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="promotionValue">Promotion Value</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="promotionValue" placeholder="Enter value">
+                <div class="input-group-append">
+                  <span class="input-group-text" id="promotionValueType">%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="promotionStartDate">Start Date</label>
+              <input type="date" class="form-control" id="promotionStartDate">
+            </div>
+            
+            <div class="form-group">
+              <label for="promotionEndDate">End Date</label>
+              <input type="date" class="form-control" id="promotionEndDate">
+            </div>
+            
+            <div class="form-group">
+              <label for="promotionCode">Promotion Code</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="promotionCode" placeholder="Enter code or generate automatically">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" id="generatePromoCode">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="promotionDescription">Description</label>
+              <textarea class="form-control" id="promotionDescription" rows="3" placeholder="Brief description of the promotion"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Create Promotion</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Active Promotions</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped" id="promotionsTable">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Value</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                  <th>Usage</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Promotion data will be loaded dynamically -->
+                <tr>
+                  <td colspan="8" class="text-center">No active promotions</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0">Marketing Materials</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="far fa-file-alt fa-3x mb-3 text-warning"></i>
+                  <h5>Rental Flyer</h5>
+                  <p class="text-muted small">Printable flyer to promote your rental business</p>
+                  <button class="btn btn-sm btn-outline-warning">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fas fa-id-card fa-3x mb-3 text-info"></i>
+                  <h5>Business Cards</h5>
+                  <p class="text-muted small">Customizable business cards with your details</p>
+                  <button class="btn btn-sm btn-outline-info">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fas fa-globe fa-3x mb-3 text-primary"></i>
+                  <h5>Social Media Posts</h5>
+                  <p class="text-muted small">Templates for social media marketing</p>
+                  <button class="btn btn-sm btn-outline-primary">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fas fa-tag fa-3x mb-3 text-success"></i>
+                  <h5>Promotion Banner</h5>
+                  <p class="text-muted small">Create promotional banners for special offers</p>
+                  <button class="btn btn-sm btn-outline-success">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="far fa-newspaper fa-3x mb-3 text-danger"></i>
+                  <h5>Newsletter Template</h5>
+                  <p class="text-muted small">Create newsletters to keep customers informed</p>
+                  <button class="btn btn-sm btn-outline-danger">Generate</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <i class="fas fa-receipt fa-3x mb-3 text-secondary"></i>
+                  <h5>Custom Receipt</h5>
+                  <p class="text-muted small">Branded receipts for your rental business</p>
+                  <button class="btn btn-sm btn-outline-secondary">Generate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

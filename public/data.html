@@ -1,0 +1,201 @@
+<!-- Data Tab -->
+<div id="dataTab" class="tab-pane">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h3>Data Analysis</h3>
+      <p class="text-muted">View and analyse your rental business data</p>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Rental Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Total Rentals</h6>
+                  <h3 id="totalRentalsCount">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Active Rentals</h6>
+                  <h3 id="activeRentalsCount">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Average Rental Duration</h6>
+                  <h3 id="avgRentalDuration">0 days</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Revenue This Month</h6>
+                  <h3 id="monthlyRevenue">£0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Car Utilisation</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Total Cars</h6>
+                  <h3 id="totalCarsCount">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Utilisation Rate</h6>
+                  <h3 id="utilisationRate">0%</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Most Rented Car</h6>
+                  <h3 id="mostRentedCar">N/A</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Least Rented Car</h6>
+                  <h3 id="leastRentedCar">N/A</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Monthly Rental Trends</h5>
+        </div>
+        <div class="card-body">
+          <div id="rentalTrendsChart">
+            <div class="d-flex justify-content-center align-items-center" style="height: 300px;">
+              <div class="text-center">
+                <i class="fas fa-chart-line fa-3x mb-3 text-muted"></i>
+                <p class="text-muted">Chart will display here once data is available.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0">Customer Analysis</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6>Repeat Customers</h6>
+            <div class="progress">
+              <div id="repeatCustomersBar" class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <h6>Average Rentals per Customer</h6>
+            <p id="avgRentalsPerCustomer">0</p>
+          </div>
+          <div>
+            <h6>Top 5 Customers</h6>
+            <ul id="topCustomersList" class="list-group">
+              <li class="list-group-item text-center text-muted">No customer data available</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">Revenue Analysis</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6>Total Revenue</h6>
+            <h3 id="totalRevenue">£0</h3>
+          </div>
+          <div class="mb-3">
+            <h6>Monthly Revenue Breakdown</h6>
+            <div id="monthlyRevenueChart">
+              <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                <div class="text-center">
+                  <i class="fas fa-chart-pie fa-3x mb-3 text-muted"></i>
+                  <p class="text-muted">Chart will display here once data is available.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Export Data</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-2">
+              <button id="exportRentalsCSV" class="btn btn-primary btn-block">
+                <i class="fas fa-file-csv mr-2"></i>Export Rentals (CSV)
+              </button>
+            </div>
+            <div class="col-md-4 mb-2">
+              <button id="exportCarsCSV" class="btn btn-success btn-block">
+                <i class="fas fa-file-csv mr-2"></i>Export Cars (CSV)
+              </button>
+            </div>
+            <div class="col-md-4 mb-2">
+              <button id="exportCustomersCSV" class="btn btn-info btn-block">
+                <i class="fas fa-file-csv mr-2"></i>Export Customers (CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

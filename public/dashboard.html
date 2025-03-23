@@ -1,0 +1,298 @@
+<!-- Dashboard Tab -->
+<div id="dashboardTab" class="tab-pane active">
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total Fleet</h5>
+          <h2 class="card-text" id="totalFleet">0</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Available Cars</h5>
+          <h2 class="card-text" id="availableCars">0</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Active Rentals</h5>
+          <h2 class="card-text" id="activeRentals">0</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Available Cars</h4>
+        </div>
+        <div class="card-body" id="availableCarsContent">
+          <!-- Available cars will be loaded here -->
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h4 class="mb-0">Active Rentals</h4>
+        </div>
+        <div class="card-body" id="activeRentalsContent">
+          <!-- Active rentals will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Tab Content -->
+<div class="container-fluid dashboard-container">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-3">Dashboard</h2>
+      <div class="d-flex justify-content-between align-items-center">
+        <button id="refreshDashboardBtn" class="btn btn-outline-primary">
+          <i class="fas fa-sync-alt mr-1"></i> Refresh
+        </button>
+        <div>
+          <button id="quickAddCarBtn" class="btn btn-outline-success mr-2">
+            <i class="fas fa-car mr-1"></i> Add Car
+          </button>
+          <button id="quickAddRentalBtn" class="btn btn-outline-info mr-2">
+            <i class="fas fa-calendar-plus mr-1"></i> Add Rental
+          </button>
+          <button id="quickAddCustomerBtn" class="btn btn-outline-secondary">
+            <i class="fas fa-user-plus mr-1"></i> Add Customer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <!-- Active Rentals -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-primary text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">Active Rentals</h5>
+              <h2 id="activeRentalsCount" class="display-4">0</h2>
+            </div>
+            <i class="fas fa-calendar-check fa-3x opacity-50"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="text-white stretched-link" onclick="$('#rentals-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Cars -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-success text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">Available Cars</h5>
+              <h2 id="availableCarsCount" class="display-4">0</h2>
+            </div>
+            <i class="fas fa-car fa-3x opacity-50"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="text-white stretched-link" onclick="$('#cars-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Revenue -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-info text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">Total Revenue</h5>
+              <h2 id="totalRevenue" class="display-4">ZMW 0.00</h2>
+            </div>
+            <i class="fas fa-money-bill-wave fa-3x opacity-50"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="text-white stretched-link" onclick="$('#data-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month's Revenue -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card bg-warning text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">Month's Revenue</h5>
+              <h2 id="monthRevenue" class="display-4">ZMW 0.00</h2>
+            </div>
+            <i class="fas fa-chart-line fa-3x opacity-50"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="text-white stretched-link" onclick="$('#data-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Stats Row -->
+  <div class="row mb-4">
+    <!-- Total Cars -->
+    <div class="col-md-4 col-sm-6 mb-3">
+      <div class="card border-primary h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title text-primary">Total Cars</h5>
+              <h2 id="totalCarsCount" class="display-4">0</h2>
+            </div>
+            <i class="fas fa-car fa-3x text-primary opacity-25"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="stretched-link" onclick="$('#cars-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Rentals -->
+    <div class="col-md-4 col-sm-6 mb-3">
+      <div class="card border-success h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title text-success">Total Rentals</h5>
+              <h2 id="totalRentalsCount" class="display-4">0</h2>
+            </div>
+            <i class="fas fa-calendar-alt fa-3x text-success opacity-25"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="stretched-link" onclick="$('#rentals-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Customers -->
+    <div class="col-md-4 col-sm-6 mb-3">
+      <div class="card border-info h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title text-info">Total Customers</h5>
+              <h2 id="customersCount" class="display-4">0</h2>
+            </div>
+            <i class="fas fa-users fa-3x text-info opacity-25"></i>
+          </div>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between">
+          <a href="#" class="stretched-link" onclick="$('#customers-tab').tab('show'); return false;">
+            View Details
+          </a>
+          <div class="small"><i class="fas fa-angle-right"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Rentals and Upcoming Reminders -->
+  <div class="row">
+    <!-- Recent Rentals -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-left-primary h-100">
+        <div class="card-header bg-light">
+          <h5 class="m-0 font-weight-bold text-primary">Recent Rentals</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="recentRentalsTable" class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>Car</th>
+                  <th>Customer</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" class="text-center">Loading recent rentals...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-light">
+          <a href="#" class="btn btn-sm btn-primary" onclick="$('#rentals-tab').tab('show'); return false;">View All Rentals</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Reminders -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-left-warning h-100">
+        <div class="card-header bg-light">
+          <h5 class="m-0 font-weight-bold text-warning">Upcoming Reminders</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="upcomingRemindersTable" class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>Car</th>
+                  <th>Type</th>
+                  <th>Title</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" class="text-center">Loading upcoming reminders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-light">
+          <a href="#" class="btn btn-sm btn-warning" onclick="$('#reminders-tab').tab('show'); return false;">View All Reminders</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

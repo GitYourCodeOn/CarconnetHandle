@@ -1,0 +1,303 @@
+<!-- Finances Tab -->
+<div id="financesTab" class="tab-pane">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h3>Financial Management</h3>
+      <p class="text-muted">Track and manage your car rental business finances</p>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Financial Overview</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Total Revenue</h6>
+                  <h3 id="totalRevenueValue" class="mb-0">£0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Total Expenses</h6>
+                  <h3 id="totalExpensesValue" class="mb-0">£0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Net Profit</h6>
+                  <h3 id="netProfitValue" class="mb-0">£0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Profit Margin</h6>
+                  <h3 id="profitMarginValue" class="mb-0">0%</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Revenue</h5>
+          <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addRevenueModal">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="revenueFilterPeriod">Filter Period</label>
+            <select class="form-control form-control-sm" id="revenueFilterPeriod">
+              <option value="thisMonth">This Month</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="thisQuarter">This Quarter</option>
+              <option value="thisYear">This Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+          
+          <div id="customRevenuePeriod" class="row d-none">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="revenueStartDate">Start Date</label>
+                <input type="date" class="form-control form-control-sm" id="revenueStartDate">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="revenueEndDate">End Date</label>
+                <input type="date" class="form-control form-control-sm" id="revenueEndDate">
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-sm table-striped" id="revenueTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Revenue entries will be loaded dynamically -->
+                <tr>
+                  <td colspan="5" class="text-center">No revenue entries found</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-weight-bold">
+                  <td colspan="3" class="text-right">Total:</td>
+                  <td id="revenueTotalValue">£0</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Expenses</h5>
+          <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#addExpenseModal">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="expenseFilterPeriod">Filter Period</label>
+            <select class="form-control form-control-sm" id="expenseFilterPeriod">
+              <option value="thisMonth">This Month</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="thisQuarter">This Quarter</option>
+              <option value="thisYear">This Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+          
+          <div id="customExpensePeriod" class="row d-none">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="expenseStartDate">Start Date</label>
+                <input type="date" class="form-control form-control-sm" id="expenseStartDate">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="expenseEndDate">End Date</label>
+                <input type="date" class="form-control form-control-sm" id="expenseEndDate">
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-sm table-striped" id="expenseTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Expense entries will be loaded dynamically -->
+                <tr>
+                  <td colspan="5" class="text-center">No expense entries found</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-weight-bold">
+                  <td colspan="3" class="text-right">Total:</td>
+                  <td id="expenseTotalValue">£0</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Financial Reports</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="reportType">Report Type</label>
+                <select class="form-control" id="reportType">
+                  <option value="revenue">Revenue Report</option>
+                  <option value="expense">Expense Report</option>
+                  <option value="profit">Profit & Loss</option>
+                  <option value="tax">Tax Summary</option>
+                  <option value="car">Per Car Report</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="reportPeriod">Period</label>
+                <select class="form-control" id="reportPeriod">
+                  <option value="thisMonth">This Month</option>
+                  <option value="lastMonth">Last Month</option>
+                  <option value="thisQuarter">This Quarter</option>
+                  <option value="lastQuarter">Last Quarter</option>
+                  <option value="thisYear">This Year</option>
+                  <option value="lastYear">Last Year</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="reportFormat">Format</label>
+                <select class="form-control" id="reportFormat">
+                  <option value="web">View Online</option>
+                  <option value="pdf">PDF</option>
+                  <option value="excel">Excel</option>
+                  <option value="csv">CSV</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div id="customReportPeriod" class="row d-none">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="reportStartDate">Start Date</label>
+                <input type="date" class="form-control" id="reportStartDate">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="reportEndDate">End Date</label>
+                <input type="date" class="form-control" id="reportEndDate">
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-3">
+            <button id="generateReport" class="btn btn-info">Generate Report</button>
+          </div>
+          
+          <div id="reportPreview" class="mt-4">
+            <!-- Report content will be displayed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0">Expense Categories</h5>
+        </div>
+        <div class="card-body">
+          <div id="expenseCategoriesChart" style="height: 300px;">
+            <!-- Expense categories chart will be displayed here -->
+            <div class="d-flex justify-content-center align-items-center h-100">
+              <div class="text-center">
+                <i class="fas fa-chart-pie fa-3x mb-3 text-muted"></i>
+                <p class="text-muted">Chart will display once data is available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Revenue by Car</h5>
+        </div>
+        <div class="card-body">
+          <div id="carRevenueChart" style="height: 300px;">
+            <!-- Car revenue chart will be displayed here -->
+            <div class="d-flex justify-content-center align-items-center h-100">
+              <div class="text-center">
+                <i class="fas fa-chart-bar fa-3x mb-3 text-muted"></i>
+                <p class="text-muted">Chart will display once data is available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

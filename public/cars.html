@@ -1,0 +1,181 @@
+<!-- Cars Tab -->
+<div id="carsTab" class="tab-pane">
+  <h3>Add Car</h3>
+  <form id="addCarForm" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Make</label>
+          <input type="text" class="form-control" name="make" placeholder="Make" required>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Model</label>
+          <input type="text" class="form-control" name="model" placeholder="Model" required>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" class="form-control" name="year" placeholder="Year" required>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Registration</label>
+          <input type="text" class="form-control" name="registration" placeholder="Car Registration">
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Mileage</label>
+          <input type="number" class="form-control" name="mileage" placeholder="Mileage" required>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Owner Name</label>
+          <input type="text" class="form-control" name="ownerName" placeholder="Owner Name">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Owner Contact</label>
+          <input type="text" class="form-control" name="ownerContact" placeholder="Owner Contact">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Owner Email</label>
+          <input type="email" class="form-control" name="ownerEmail" placeholder="Owner Email">
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>Notes (e.g., 2 keys, special features)</label>
+          <textarea class="form-control" name="notes" placeholder="Enter notes about the car"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <a class="btn btn-link text-dark" data-toggle="collapse" href="#remindersCollapse" role="button" aria-expanded="false">
+          <i class="fas fa-bell mr-2"></i> Reminders (Optional)
+          <i class="fas fa-chevron-down ml-2"></i>
+        </a>
+      </div>
+      <div class="collapse" id="remindersCollapse">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Service Due</label>
+                <input type="date" class="form-control" name="serviceDue">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Tax Due</label>
+                <input type="date" class="form-control" name="taxDate">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Insurance Due</label>
+                <input type="date" class="form-control" name="insuranceDate">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Registration Renewal</label>
+                <input type="date" class="form-control" name="registrationDate">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Tire Change Due</label>
+                <input type="date" class="form-control" name="tireChangeDate">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Custom Reminder</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" name="customReminderTitle" placeholder="e.g., Change ownership, Renew permit">
+                  <div class="input-group-append">
+                    <span class="input-group-text">Due Date</span>
+                  </div>
+                  <input type="date" class="form-control" name="customReminderDate">
+                </div>
+                <small class="text-muted">Add a custom reminder for this car with a specific due date</small>
+              </div>
+            </div>
+          </div>
+          
+          <small class="text-muted">You can add or edit reminders later from the car details page.</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Car Documents (Registration, Insurance, etc.)</label>
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" id="carDocuments" name="documents" multiple accept="image/*,application/pdf">
+        <label class="custom-file-label" for="carDocuments">Choose documents...</label>
+      </div>
+      <small class="form-text text-muted">You can select multiple documents (images or PDFs)</small>
+      <div id="carDocumentPreview" class="mt-3 row">
+        <!-- Document previews will be added here -->
+      </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Add Car</button>
+  </form>
+  
+  <hr>
+  
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-white">
+          <h4 class="mb-0">Upcoming Reminders</h4>
+        </div>
+        <div class="card-body" id="upcomingRemindersContent">
+          <!-- Upcoming reminders will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <h4>All Cars</h4>
+  <table class="table table-bordered" id="carsTable">
+    <thead>
+      <tr>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>Registration</th>
+        <th>Mileage</th>
+        <th>Owner</th>
+        <th>Reminders</th>
+        <th>Documents</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div> 

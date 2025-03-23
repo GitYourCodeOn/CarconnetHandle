@@ -1,0 +1,255 @@
+<!-- Reminders Tab -->
+<div id="remindersTab" class="tab-pane">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Reminders</h3>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#reminderModal">
+          <i class="fas fa-plus-circle mr-2"></i>Add Reminder
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-exclamation-circle mr-2"></i>Urgent Reminders</h5>
+        </div>
+        <div class="card-body p-0">
+          <div id="urgentReminders" class="reminder-list">
+            <!-- Urgent reminders will be dynamically loaded here -->
+            <div class="empty-state text-center py-4">
+              <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+              <p class="text-muted">No urgent reminders at the moment</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <ul class="nav nav-tabs mb-3" id="reminderTabs">
+        <li class="nav-item">
+          <a class="nav-link active" id="all-reminders-tab" data-toggle="tab" href="#allRemindersTab">All Reminders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="car-reminders-tab" data-toggle="tab" href="#carRemindersTab">Car Reminders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="rental-reminders-tab" data-toggle="tab" href="#rentalRemindersTab">Rental Reminders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="custom-reminders-tab" data-toggle="tab" href="#customRemindersTab">Custom Reminders</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content" id="reminderTabContent">
+        <!-- All Reminders Tab -->
+        <div class="tab-pane fade show active" id="allRemindersTab">
+          <div class="reminder-filters mb-3">
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <label class="mr-2">Filter by:</label>
+              </div>
+              <div class="col-auto">
+                <select id="reminderStatusFilter" class="form-control form-control-sm">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <select id="reminderTypeFilter" class="form-control form-control-sm">
+                  <option value="all">All Types</option>
+                  <option value="service">Service</option>
+                  <option value="tax">Tax</option>
+                  <option value="insurance">Insurance</option>
+                  <option value="registration">Registration</option>
+                  <option value="rental">Rental</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <input type="text" id="reminderSearchFilter" class="form-control form-control-sm" placeholder="Search...">
+              </div>
+              <div class="col-auto">
+                <button id="applyReminderFilters" class="btn btn-sm btn-primary">Apply</button>
+                <button id="resetReminderFilters" class="btn btn-sm btn-secondary">Reset</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-striped" id="allRemindersTable">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Due Date</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Related To</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Car Reminders Tab -->
+        <div class="tab-pane fade" id="carRemindersTab">
+          <div class="reminder-filters mb-3">
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <select id="carReminderStatusFilter" class="form-control form-control-sm">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <select id="carReminderTypeFilter" class="form-control form-control-sm">
+                  <option value="all">All Types</option>
+                  <option value="service">Service</option>
+                  <option value="tax">Tax</option>
+                  <option value="insurance">Insurance</option>
+                  <option value="registration">Registration</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <input type="text" id="carReminderSearchFilter" class="form-control form-control-sm" placeholder="Search car...">
+              </div>
+              <div class="col-auto">
+                <button id="applyCarReminderFilters" class="btn btn-sm btn-primary">Apply</button>
+                <button id="resetCarReminderFilters" class="btn btn-sm btn-secondary">Reset</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-striped" id="carRemindersTable">
+              <thead>
+                <tr>
+                  <th>Car</th>
+                  <th>Reminder</th>
+                  <th>Due Date</th>
+                  <th>Type</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Rental Reminders Tab -->
+        <div class="tab-pane fade" id="rentalRemindersTab">
+          <div class="reminder-filters mb-3">
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <select id="rentalReminderStatusFilter" class="form-control form-control-sm">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <input type="text" id="rentalReminderSearchFilter" class="form-control form-control-sm" placeholder="Search rental/customer...">
+              </div>
+              <div class="col-auto">
+                <button id="applyRentalReminderFilters" class="btn btn-sm btn-primary">Apply</button>
+                <button id="resetRentalReminderFilters" class="btn btn-sm btn-secondary">Reset</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-striped" id="rentalRemindersTable">
+              <thead>
+                <tr>
+                  <th>Rental</th>
+                  <th>Customer</th>
+                  <th>Car</th>
+                  <th>Due Date</th>
+                  <th>Days Left</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Custom Reminders Tab -->
+        <div class="tab-pane fade" id="customRemindersTab">
+          <div class="reminder-filters mb-3">
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <select id="customReminderStatusFilter" class="form-control form-control-sm">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <select id="customReminderPriorityFilter" class="form-control form-control-sm">
+                  <option value="all">All Priorities</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <input type="text" id="customReminderSearchFilter" class="form-control form-control-sm" placeholder="Search...">
+              </div>
+              <div class="col-auto">
+                <button id="applyCustomReminderFilters" class="btn btn-sm btn-primary">Apply</button>
+                <button id="resetCustomReminderFilters" class="btn btn-sm btn-secondary">Reset</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-striped" id="customRemindersTable">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Due Date</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="calendar-view mt-4">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="far fa-calendar-alt mr-2"></i>Reminder Calendar</h5>
+      </div>
+      <div class="card-body">
+        <div id="reminderCalendar"></div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,623 @@
+/* CarConnect Lusaka - Main Stylesheet */
+
+/* Global Styles */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --danger-color: #e74c3c;
+  --warning-color: #f39c12;
+  --info-color: #3498db;
+  --dark-color: #2c3e50;
+  --light-color: #ecf0f1;
+  --grey-color: #95a5a6;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  padding-bottom: 60px;
+}
+
+/* Custom Container */
+.main-container {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+/* Navigation Tabs */
+.nav-tabs .nav-link {
+  border-radius: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 0.6rem 1rem;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--primary-color);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  border-bottom: 3px solid var(--primary-color);
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link i {
+  margin-right: 8px;
+}
+
+/* Dashboard Styles */
+.stat-card {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card .card-body {
+  padding: 1.5rem;
+}
+
+.stat-card .card-title {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--dark-color);
+}
+
+.stat-card .stat-icon {
+  font-size: 3rem;
+  opacity: 0.2;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1rem;
+}
+
+.stat-card.primary {
+  background-color: #f0f7ff;
+}
+
+.stat-card.success {
+  background-color: #f0fff7;
+}
+
+.stat-card.warning {
+  background-color: #fffbf0;
+}
+
+/* Car and Rental Forms */
+.rental-form-container, .car-form-container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-control {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 1rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.custom-select {
+  border-radius: 5px;
+  height: calc(1.5em + 1.2rem + 2px);
+}
+
+.custom-file-label {
+  padding: 0.6rem 1rem;
+  height: calc(1.5em + 1.2rem + 2px);
+}
+
+/* Tables */
+.table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Reminder Cards */
+.reminder-card {
+  border-left: 4px solid var(--primary-color);
+  border-radius: 5px;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.reminder-card:hover {
+  transform: translateX(5px);
+}
+
+.reminder-card.urgent {
+  border-left-color: var(--danger-color);
+}
+
+.reminder-card.warning {
+  border-left-color: var(--warning-color);
+}
+
+.reminder-card.normal {
+  border-left-color: var(--info-color);
+}
+
+.reminder-card .card-body {
+  padding: 1rem;
+}
+
+.reminder-card .reminder-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.reminder-card .reminder-date {
+  font-size: 0.8rem;
+  color: var(--grey-color);
+}
+
+.reminder-card .reminder-action {
+  font-size: 0.8rem;
+}
+
+/* Modals */
+.modal-header {
+  border-bottom: 2px solid var(--primary-color);
+  background-color: #f8f9fa;
+}
+
+.modal-footer {
+  border-top: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+/* Settings Styles */
+.settings-nav .nav-link {
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.settings-nav .nav-link:hover {
+  background-color: #f8f9fa;
+}
+
+.settings-nav .nav-link.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.settings-content .card {
+  border: none;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.settings-content .card-header {
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 1.5rem;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-secondary {
+  color: var(--secondary-color) !important;
+}
+
+.text-danger {
+  color: var(--danger-color) !important;
+}
+
+.text-warning {
+  color: var(--warning-color) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color) !important;
+}
+
+.bg-danger {
+  background-color: var(--danger-color) !important;
+}
+
+.bg-warning {
+  background-color: var(--warning-color) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 1rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.8rem;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .rental-form-container, .car-form-container {
+    padding: 1rem;
+  }
+  
+  .table thead th {
+    font-size: 0.7rem;
+  }
+  
+  .nav-tabs .nav-link i {
+    margin-right: 4px;
+  }
+  
+  .settings-nav .nav-link {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Document Preview */
+.document-preview {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.document-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.document-preview .document-actions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.document-preview .document-type {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+/* Empty States */
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--grey-color);
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: var(--grey-color);
+  margin-bottom: 1rem;
+}
+
+/* Loading Indicators */
+.loading-spinner {
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.custom-toast {
+  min-width: 250px;
+  border-radius: 5px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Calendar View */
+#reminderCalendar {
+  height: 500px;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge.active {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+}
+
+.status-badge.overdue {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #c0392b;
+}
+
+.status-badge.pending {
+  background-color: rgba(243, 156, 18, 0.15);
+  color: #d35400;
+}
+
+.status-badge.completed {
+  background-color: rgba(52, 152, 219, 0.15);
+  color: #2980b9;
+}
+
+/* Hide all tab panes by default */
+.tab-pane { display: none; }
+/* Only the active tab pane is shown */
+.tab-pane.active { display: block; }
+/* Optional margin for progress bars */
+.progress { margin-bottom: 10px; }
+/* Spanner button style override */
+.spanner-btn { border: none; }
+/* Add to your existing styles */
+.rental-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.rental-details p {
+    margin-bottom: 0.5rem;
+}
+
+.rental-details i {
+    width: 20px;
+    color: #6c757d;
+}
+
+input[type="datetime-local"] {
+    padding: 0.5rem;
+}
+
+.text-danger {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Add to your existing styles */
+.rental-form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.rental-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.rental-form label {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.rental-form .form-control {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.rental-form .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.custom-select {
+    height: calc(1.5em + 1.5rem + 2px);
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.highlight-animation {
+    animation: highlight-pulse 1.5s ease;
+}
+
+@keyframes highlight-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 123, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .container {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode .card {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-mode .card-header {
+    background-color: #333;
+    border-color: #444;
+}
+
+body.dark-mode .table {
+    color: #e0e0e0;
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .table-bordered,
+body.dark-mode .table-bordered td,
+body.dark-mode .table-bordered th {
+    border-color: #444;
+}
+
+body.dark-mode .form-control {
+    background-color: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .form-control:focus {
+    background-color: #3a3a3a;
+    color: #fff;
+}
+
+body.dark-mode .nav-tabs {
+    border-color: #444;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+    color: #bbb;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    background-color: #2d2d2d;
+    border-color: #444 #444 #2d2d2d;
+    color: #fff;
+}
+
+body.dark-mode .modal-content {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    border-color: #444;
+}
+
+body.dark-mode .close {
+    color: #e0e0e0;
+}
+
+body.dark-mode .rental-details {
+    background: #333;
+}
+
+body.dark-mode .rental-form-container {
+    background: #2d2d2d;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+} 

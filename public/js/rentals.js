@@ -110,9 +110,22 @@ const Rentals = (function() {
       // Handle documents/notes
       const hasDocuments = rental.documents && rental.documents.length > 0;
       const hasNotes = rental.note && rental.note.trim().length > 0;
+      
+      // Format status label for display
+      const statusLabel = `<span class="badge badge-pill ${statusClass}">${statusText}</span>`;
+      
+      // Modified documents/notes column with action buttons
       const docsNotesHtml = `
         ${hasDocuments ? '<i class="fas fa-file-alt mr-2" title="Has documents"></i>' : ''}
-        ${hasNotes ? '<i class="fas fa-sticky-note" title="Has notes"></i>' : ''}
+        ${hasNotes ? '<i class="fas fa-sticky-note mr-2" title="Has notes"></i>' : ''}
+        <div class="btn-group btn-group-sm mt-1">
+          <button class="btn btn-outline-info btn-sm add-note-btn" data-id="${rental._id}">
+            <i class="fas fa-plus-circle"></i> Add Note
+          </button>
+          <button class="btn btn-outline-secondary btn-sm add-document-btn" data-id="${rental._id}">
+            <i class="fas fa-file-upload"></i> Add Doc
+          </button>
+        </div>
       `;
       
       const row = `
@@ -124,7 +137,10 @@ const Rentals = (function() {
           <td>${formattedEndDate}</td>
           <td>${formattedFee}</td>
           <td>${durationDays} days</td>
-          <td>${timeRemaining}</td>
+          <td>
+            ${timeRemaining}
+            <div class="mt-1">${statusLabel}</div>
+          </td>
           <td>${docsNotesHtml}</td>
           <td>
             <div class="dropdown">
@@ -134,7 +150,10 @@ const Rentals = (function() {
               <div class="dropdown-menu" aria-labelledby="actionsDropdown${rental._id}">
                 <a class="dropdown-item view-rental-btn" href="#" data-id="${rental._id}">View Details</a>
                 <a class="dropdown-item edit-rental-btn" href="#" data-id="${rental._id}">Edit</a>
-                ${!rental.returned ? `<a class="dropdown-item return-rental-btn" href="#" data-id="${rental._id}">Mark Returned</a>` : ''}
+                ${!rental.returned ? `
+                  <a class="dropdown-item mark-returned-btn" href="#" data-id="${rental._id}">Mark Returned</a>
+                  <a class="dropdown-item mark-overdue-btn" href="#" data-id="${rental._id}">Mark Overdue</a>
+                ` : ''}
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item delete-rental-btn text-danger" href="#" data-id="${rental._id}">Delete</a>
               </div>
@@ -453,6 +472,184 @@ const Rentals = (function() {
         error: function(xhr, status, error) {
           console.error('Error updating rental:', xhr.responseText);
           Main.showAlert(`Failed to update rental: ${xhr.responseJSON?.message || error}`, 'danger');
+        }
+      });
+    });
+
+    // Add Note button
+    $(document).on('click', '.add-note-btn', function() {
+      const rentalId = $(this).data('id');
+      // Show note modal
+      $('#addNoteRentalId').val(rentalId);
+      $('#addNoteModal').modal('show');
+    });
+
+    // Add Document button
+    $(document).on('click', '.add-document-btn', function() {
+      const rentalId = $(this).data('id');
+      $('#addDocumentsRentalId').val(rentalId);
+      
+      // Load existing documents for this rental
+      $.get(`/api/rentals/${rentalId}/documents`, function(documents) {
+        const docList = $('#existingDocumentsList');
+        docList.empty();
+        
+        if (documents && documents.length > 0) {
+          documents.forEach(doc => {
+            docList.append(`
+              <div class="existing-document">
+                <a href="${doc.url}" target="_blank">${doc.name}</a>
+                <small class="text-muted">(${new Date(doc.uploadDate).toLocaleString()})</small>
+              </div>
+            `);
+          });
+        } else {
+          docList.html('<p class="text-muted">No documents attached yet</p>');
+        }
+      });
+      
+      $('#addDocumentsModal').modal('show');
+    });
+
+    // Handle document form submission with AJAX
+    $('#addDocumentsForm').submit(function(e) {
+      e.preventDefault();
+      
+      const rentalId = $('#addDocumentsRentalId').val();
+      const formData = new FormData(this);
+      
+      $.ajax({
+        url: `/api/rentals/${rentalId}/documents`,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          $('#addDocumentsModal').modal('hide');
+          Main.showAlert('Documents added successfully', 'success');
+          // Refresh the rentals list to show updated document count
+          Rentals.loadRentals();
+        },
+        error: function(xhr) {
+          console.error('Error uploading documents:', xhr.responseText);
+          Main.showAlert('Failed to upload documents: ' + (xhr.responseJSON?.error || 'Server error'), 'danger');
+        }
+      });
+    });
+
+    // Add note functionality
+    $('#saveNoteBtn').on('click', function() {
+      const rentalId = $('#addNoteRentalId').val();
+      const noteContent = $('#noteContent').val().trim();
+      
+      if (!noteContent) {
+        Main.showAlert('Please enter a note', 'warning');
+        return;
+      }
+      
+      // Log what we're sending for debugging
+      console.log('Sending note data:', { noteContent, rentalId });
+      
+      $.ajax({
+        url: `/api/rentals/${rentalId}/notes`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          noteContent: noteContent,  // Changed from 'content' to 'noteContent'
+          content: noteContent       // Also send as 'content' as a fallback
+        }),
+        success: function(response) {
+          // Clear the input field
+          $('#noteContent').val('');
+          
+          // Update the existing notes display
+          loadRentalNotes(rentalId);
+          
+          Main.showAlert('Note added successfully', 'success');
+        },
+        error: function(xhr) {
+          console.error('Error adding note:', xhr.responseText);
+          Main.showAlert('Failed to add note: ' + (xhr.responseJSON?.message || 'Server error'), 'danger');
+        }
+      });
+    });
+
+    // Function to load notes for a rental
+    function loadRentalNotes(rentalId) {
+      $.get(`/api/rentals/${rentalId}/notes`, function(notes) {
+        const notesList = $('.existing-notes-list');
+        notesList.empty();
+        
+        if (notes && notes.length > 0) {
+          notes.forEach(note => {
+            const date = new Date(note.timestamp).toLocaleString();
+            notesList.append(`
+              <div class="note-entry mb-2 p-2 border-left border-primary">
+                <div class="note-content">${note.content}</div>
+                <small class="text-muted">Added on ${date} by ${note.author}</small>
+              </div>
+            `);
+          });
+        } else {
+          notesList.html('<p class="text-muted">No notes have been added yet</p>');
+        }
+      });
+    }
+
+    // Mark as Returned with customer rating
+    $(document).on('click', '.mark-returned-btn', function() {
+      const rentalId = $(this).data('id');
+      // Show customer rating modal
+      $('#returnRentalId').val(rentalId);
+      $('#returnRentalModal').modal('show');
+    });
+
+    // Mark as Overdue
+    $(document).on('click', '.mark-overdue-btn', function() {
+      const rentalId = $(this).data('id');
+      
+      if (confirm('Are you sure you want to mark this rental as overdue?')) {
+        $.ajax({
+          url: `/api/rentals/${rentalId}/status`,
+          method: 'PUT',
+          contentType: 'application/json',
+          data: JSON.stringify({ status: 'overdue' }),
+          success: function() {
+            loadRentals();
+            Main.showAlert('Rental marked as overdue', 'warning');
+          },
+          error: function(error) {
+            console.error('Error marking rental as overdue:', error);
+            Main.showAlert('Failed to update rental status', 'danger');
+          }
+        });
+      }
+    });
+
+    // Submit customer rating when marking rental as returned
+    $('#returnRentalForm').submit(function(e) {
+      e.preventDefault();
+      
+      const rentalId = $('#returnRentalId').val();
+      const rating = $('input[name="customerRating"]:checked').val();
+      const comment = $('#returnComment').val();
+      
+      $.ajax({
+        url: `/api/rentals/${rentalId}/return`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          rating: rating,
+          comment: comment 
+        }),
+        success: function() {
+          $('#returnRentalModal').modal('hide');
+          loadRentals();
+          Main.showAlert('Rental marked as returned with customer rating', 'success');
+        },
+        error: function(error) {
+          console.error('Error processing rental return:', error);
+          Main.showAlert('Failed to process rental return', 'danger');
         }
       });
     });

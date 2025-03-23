@@ -156,4 +156,118 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Add this modal for customer rating when returning -->
+<div class="modal fade" id="returnRentalModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="returnRentalForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Rate Customer Experience</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="returnRentalId">
+          <div class="form-group">
+            <label>How was the customer?</label>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="ratingGood" name="customerRating" value="good" class="custom-control-input" checked>
+              <label class="custom-control-label" for="ratingGood">Good customer</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="ratingBad" name="customerRating" value="bad" class="custom-control-input">
+              <label class="custom-control-label" for="ratingBad">Bad customer</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="returnComment">Additional comments</label>
+            <textarea class="form-control" id="returnComment" rows="3" placeholder="Optional comments"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Complete Return</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add this modal for adding notes with timestamps -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Note to Rental</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addNoteForm">
+          <input type="hidden" id="addNoteRentalId">
+          <div class="form-group">
+            <label for="noteContent">Note</label>
+            <textarea class="form-control" id="noteContent" rows="3" required></textarea>
+          </div>
+          
+          <div id="existingNotes" class="mt-4">
+            <h6>Existing Notes</h6>
+            <div class="existing-notes-list">
+              <!-- Existing notes will be loaded here -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveNoteBtn">Add Note</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add or update the documents modal -->
+<div class="modal fade" id="addDocumentsModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Documents to Rental</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addDocumentsForm" enctype="multipart/form-data">
+          <input type="hidden" id="addDocumentsRentalId" name="rentalId">
+          <div class="form-group">
+            <label for="documentFiles">Select Documents</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="documentFiles" name="documents" multiple>
+              <label class="custom-file-label" for="documentFiles">Choose files...</label>
+            </div>
+            <small class="form-text text-muted">You can select multiple files</small>
+          </div>
+          
+          <div id="documentPreview" class="mt-3 row">
+            <!-- Document previews will be shown here -->
+          </div>
+          
+          <div class="mt-4">
+            <h6>Existing Documents</h6>
+            <div id="existingDocumentsList">
+              <!-- Existing documents will be loaded here -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" form="addDocumentsForm" class="btn btn-primary">Upload Documents</button>
+      </div>
+    </div>
+  </div>
 </div> 

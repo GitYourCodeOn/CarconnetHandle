@@ -5058,7 +5058,7 @@
       if (!$('#editCarForm').length) {
         // If the edit form doesn't exist yet, create it
         const editForm = `
-          <form id="editCarForm" class="car-details-edit" enctype="multipart/form-data">
+          <form id="editCarForm" class="car-details-edit">
             <div class="card mb-3">
               <div class="card-header bg-light">
                 <h5 class="mb-0">Vehicle Information</h5>
@@ -5067,29 +5067,14 @@
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="editMake">Make</label>
-                      <input type="text" class="form-control" id="editMake" name="make" required>
+                      <label for="editCarMake">Make</label>
+                      <input type="text" class="form-control" id="editCarMake" name="make" value="${car.make || ''}">
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="editModel">Model</label>
-                      <input type="text" class="form-control" id="editModel" name="model" required>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="editYear">Year</label>
-                      <input type="number" class="form-control" id="editYear" name="year" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="editRegistration">Registration</label>
-                      <input type="text" class="form-control" id="editRegistration" name="registration">
+                      <label for="editCarModel">Model</label>
+                      <input type="text" class="form-control" id="editCarModel" name="model" value="${car.model || ''}">
                     </div>
                   </div>
                 </div>
@@ -5097,14 +5082,29 @@
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="editMileage">Mileage</label>
-                      <input type="number" class="form-control" id="editMileage" name="mileage" required>
+                      <label for="editCarYear">Year</label>
+                      <input type="number" class="form-control" id="editCarYear" name="year" value="${car.year || ''}">
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="editColor">Colour</label>
-                      <input type="text" class="form-control" id="editColor" name="color">
+                      <label for="editCarRegistration">Registration</label>
+                      <input type="text" class="form-control" id="editCarRegistration" name="registration" value="${car.registration || ''}">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editCarMileage">Mileage</label>
+                      <input type="number" class="form-control" id="editCarMileage" name="mileage" value="${car.mileage || ''}">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="editCarColor">Colour</label>
+                      <input type="text" class="form-control" id="editCarColor" name="color" value="${car.color || ''}">
                     </div>
                   </div>
                 </div>
@@ -5119,20 +5119,20 @@
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="editOwnerName">Name</label>
-                      <input type="text" class="form-control" id="editOwnerName" name="ownerName">
+                      <label for="editCarOwnerName">Name</label>
+                      <input type="text" class="form-control" id="editCarOwnerName" name="ownerName" value="${car.ownerName || ''}">
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="editOwnerContact">Contact</label>
-                      <input type="text" class="form-control" id="editOwnerContact" name="ownerContact">
+                      <label for="editCarOwnerContact">Contact</label>
+                      <input type="text" class="form-control" id="editCarOwnerContact" name="ownerContact" value="${car.ownerContact || ''}">
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="editOwnerEmail">Email</label>
-                      <input type="email" class="form-control" id="editOwnerEmail" name="ownerEmail">
+                      <label for="editCarOwnerEmail">Email</label>
+                      <input type="email" class="form-control" id="editCarOwnerEmail" name="ownerEmail" value="${car.ownerEmail || ''}">
                     </div>
                   </div>
                 </div>
@@ -5145,94 +5145,114 @@
               </div>
               <div class="card-body">
                 <div class="form-group">
-                  <textarea class="form-control" id="editNotes" name="notes" rows="3" placeholder="Enter any additional information about this car..."></textarea>
+                  <textarea class="form-control" id="editCarNotes" name="notes" rows="3">${car.notes || ''}</textarea>
                 </div>
               </div>
             </div>
             
-            <div class="mt-3 text-right">
-              <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+            <div class="text-right mt-3">
+              <button type="button" class="btn btn-secondary mr-2" id="cancelEditCarBtn">Cancel</button>
               <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         `;
         
-        // Append the edit form after the view content
+        // Append the form to the tab content
         $('#basicInfoTab').append(editForm);
       } else {
-        // If the form already exists, just show it
-        $('.car-details-edit').removeClass('d-none');
+        // If the form already exists, just update its values with latest car data
+        $('#editCarMake').val(car.make || '');
+        $('#editCarModel').val(car.model || '');
+        $('#editCarYear').val(car.year || '');
+        $('#editCarRegistration').val(car.registration || '');
+        $('#editCarMileage').val(car.mileage || '');
+        $('#editCarColor').val(car.color || '');
+        $('#editCarOwnerName').val(car.ownerName || '');
+        $('#editCarOwnerContact').val(car.ownerContact || '');
+        $('#editCarOwnerEmail').val(car.ownerEmail || '');
+        $('#editCarNotes').val(car.notes || '');
+        
+        // Show the edit form
+        $('#editCarForm').removeClass('d-none');
       }
-      
-      // Populate the form with car data
-      $('#editMake').val(car.make);
-      $('#editModel').val(car.model);
-      $('#editYear').val(car.year);
-      $('#editRegistration').val(car.registration || '');
-      $('#editMileage').val(car.mileage);
-      $('#editColor').val(car.color || '');
-      
-      // Owner information
-      $('#editOwnerName').val(car.owner ? car.owner.name || '' : '');
-      $('#editOwnerContact').val(car.owner ? car.owner.contact || '' : '');
-      $('#editOwnerEmail').val(car.owner ? car.owner.email || '' : '');
-      
-      // Notes
-      $('#editNotes').val(car.notes || '');
-      
-      // Hide the edit button and show a cancel button
-      $('#editCarDetailsBtn').addClass('d-none');
     }).fail(function(error) {
-      console.error('Error fetching car details for editing:', error);
-      showAlert('Failed to load car details for editing', 'danger');
+      showToast('Error loading car details: ' + error.responseJSON?.error || 'Unknown error', 'danger');
     });
   });
   
-  // Handle Cancel Edit button click
-  $(document).on('click', '#cancelEditBtn', function() {
+  // Handle Cancel Edit Car button click
+  $(document).on('click', '#cancelEditCarBtn', function() {
     // Hide the edit form
-    $('.car-details-edit').addClass('d-none');
+    $('#editCarForm').addClass('d-none');
     
     // Show the view-only content
     $('.car-details-view').removeClass('d-none');
-    
-    // Show the edit button again
-    $('#editCarDetailsBtn').removeClass('d-none');
   });
   
-  // Handle Edit Car form submission
+  // Handle Edit Car Form submission
   $(document).on('submit', '#editCarForm', function(e) {
     e.preventDefault();
     
     const carId = $('#editCarId').val();
     
-    // Create FormData object to handle file uploads
-    const formData = new FormData(this);
+    // Collect form data
+    const carData = {
+      make: $('#editCarMake').val(),
+      model: $('#editCarModel').val(),
+      year: $('#editCarYear').val(),
+      registration: $('#editCarRegistration').val(),
+      mileage: $('#editCarMileage').val(),
+      color: $('#editCarColor').val(),
+      ownerName: $('#editCarOwnerName').val(),
+      ownerContact: $('#editCarOwnerContact').val(),
+      ownerEmail: $('#editCarOwnerEmail').val(),
+      notes: $('#editCarNotes').val()
+    };
     
-    // Show loading state
-    const $btn = $(this).find('button[type="submit"]');
-    const originalHtml = $btn.html();
-    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+    // Show loading state on submit button
+    const submitBtn = $(this).find('button[type="submit"]');
+    const originalBtnText = submitBtn.text();
+    submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
     
-    // Submit the form
+    // Send update request
     $.ajax({
       url: `/api/cars/${carId}`,
-      method: 'PUT',
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function(response) {
-        showAlert('Car updated successfully', 'success');
+      type: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify(carData),
+      success: function(updatedCar) {
+        // Hide the edit form
+        $('#editCarForm').addClass('d-none');
         
-        // Reload car details with the updated information
-        loadCarDetails(carId);
+        // Update the view with new data
+        $('#carDetailsMake').text(updatedCar.make || '-');
+        $('#carDetailsModel').text(updatedCar.model || '-');
+        $('#carDetailsYear').text(updatedCar.year || '-');
+        $('#carDetailsRegistration').text(updatedCar.registration || '-');
+        $('#carDetailsMileage').text(updatedCar.mileage ? updatedCar.mileage.toLocaleString() : '-');
+        $('#carDetailsColor').text(updatedCar.color || '-');
+        $('#carDetailsOwnerName').text(updatedCar.ownerName || '-');
+        $('#carDetailsOwnerContact').text(updatedCar.ownerContact || '-');
+        $('#carDetailsOwnerEmail').text(updatedCar.ownerEmail || '-');
+        $('#carDetailsNotes').text(updatedCar.notes || 'No notes available.');
         
-        // Refresh the cars table
-        updateCarsTable();
+        // Show the view-only content
+        $('.car-details-view').removeClass('d-none');
+        
+        // Show success message
+        showToast('Car details updated successfully', 'success');
+        
+        // Refresh the cars list if it exists on the page
+        if (typeof loadCars === 'function') {
+          loadCars();
+        }
       },
       error: function(xhr, status, error) {
-        showAlert('Error updating car: ' + (xhr.responseJSON?.error || error), 'danger');
-        $btn.prop('disabled', false).html(originalHtml);
+        showToast('Error updating car: ' + (xhr.responseJSON?.error || error), 'danger');
+      },
+      complete: function() {
+        // Reset button state
+        submitBtn.prop('disabled', false).text(originalBtnText);
       }
     });
   });

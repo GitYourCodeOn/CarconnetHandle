@@ -2,141 +2,51 @@
 const Dashboard = (function() {
   // Load Dashboard (available cars and active rentals)
   function loadDashboard() {
-    console.log('Loading dashboard...'); // Debug log
+    console.log('Loading dashboard...');
     
-    // Load cars and rentals
-    $.when(
-        $.get('/api/cars'),
-        $.get('/api/rentals/active')
-    ).done(function(carsResponse, rentalsResponse) {
-        console.log('Data received:', { cars: carsResponse[0], rentals: rentalsResponse[0] }); // Debug log
+    // Load all rentals to properly count active ones
+    $.get('/api/rentals', function(rentals) {
+      console.log('Rentals loaded:', rentals.length);
+      
+      const today = new Date();
+      
+      // Filter for active rentals - those that haven't been returned and are within their rental period
+      const activeRentals = rentals.filter(rental => {
+        const startDate = new Date(rental.startDate);
+        const endDate = new Date(rental.endDate);
         
-        const cars = carsResponse[0];
-        const activeRentals = rentalsResponse[0];
+        return !rental.returnDate && today >= startDate && today <= endDate;
+      });
+      
+      console.log('Active rentals count:', activeRentals.length);
+      $('#activeRentalsCount').text(activeRentals.length);
+      
+      // Load cars to show available ones
+      $.get('/api/cars', function(cars) {
+        console.log('Cars loaded:', cars.length);
         
-        // Get IDs of cars that are currently rented
-        const rentedCarIds = activeRentals.map(rental => rental.car._id);
+        // Get IDs of cars that are in active rentals
+        const rentedCarIds = activeRentals.map(rental => {
+          return rental.car?._id || rental.carId;
+        });
         
         // Filter available cars (not in active rentals)
         const availableCars = cars.filter(car => !rentedCarIds.includes(car._id));
         
-        // Update stats
+        // Update dashboard counts
         $('#totalFleet').text(cars.length);
-        $('#activeRentals').text(activeRentals.length);
-        $('#availableCars').text(availableCars.length);
-
-        // Update available cars list
-        let availableCarsHtml = '';
-        if (availableCars.length === 0) {
-            availableCarsHtml = '<div class="alert alert-info">No cars available at the moment</div>';
-        } else {
-            availableCarsHtml = '<div class="list-group">';
-            availableCars.forEach(car => {
-                availableCarsHtml += `
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="mb-1">${car.make} ${car.model} (${car.year || ''})</h5>
-                                <small class="text-muted">Mileage: ${car.mileage} km</small>
-                            </div>
-                            <button class="btn btn-sm btn-success rent-now-btn" data-id="${car._id}">
-                                Rent Now
-                            </button>
-                        </div>
-                    </div>`;
-            });
-            availableCarsHtml += '</div>';
+        $('#availableCarsCount').text(availableCars.length);
+        
+        // Update active rentals list (if it exists on the dashboard)
+        if ($('#activeRentalsList').length) {
+          updateActiveRentalsList(activeRentals);
         }
-        $('#availableCarsContent').html(availableCarsHtml);
-
-        // Update active rentals list
-        let activeRentalsHtml = '';
-        if (activeRentals.length === 0) {
-            activeRentalsHtml = '<div class="alert alert-info">No active rentals at the moment</div>';
-        } else {
-            activeRentalsHtml = '<div class="list-group">';
-            activeRentals.forEach(rental => {
-                const now = new Date().getTime();
-                const start = new Date(rental.rentalDate).getTime();
-                const end = new Date(rental.returnDate).getTime();
-                const progress = Math.min(100, Math.round(((now - start) / (end - start)) * 100));
-                const isCompleted = now >= end;
-                
-                // Calculate time remaining only if not completed
-                let timeRemainingHtml = '';
-                if (!isCompleted) {
-                    const timeLeft = end - now;
-                    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    timeRemainingHtml = `
-                        <small class="text-${timeLeft < 86400000 ? 'danger' : 'info'}">
-                            Time Remaining: ${daysLeft}d ${hoursLeft}h ${minutesLeft}m
-                        </small>`;
-                }
-                
-                activeRentalsHtml += `
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">${rental.car && rental.car.make ? `${rental.car.make} ${rental.car.model} (${rental.car.year || ''})` : 'N/A'}</h5>
-                            <span class="badge badge-${isCompleted ? 'danger' : 'success'}">
-                                ${isCompleted ? 'Completed' : 'Active'}
-                            </span>
-                        </div>
-                        <p class="mb-2">
-                            <strong>Customer:</strong> ${rental.customerName}<br>
-                            <strong>Start:</strong> ${new Date(rental.rentalDate).toLocaleString('en-GB')}<br>
-                            <strong>End:</strong> ${new Date(rental.returnDate).toLocaleString('en-GB')}
-                        </p>
-                        <div class="progress mb-2">
-                            <div class="progress-bar ${isCompleted ? 'bg-danger' : 'bg-success'}" 
-                                role="progressbar" 
-                                style="width: ${progress}%;" 
-                                aria-valuenow="${progress}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="100">
-                                ${progress}%
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            ${timeRemainingHtml}
-                            <div class="btn-group">
-                                ${isCompleted ? `
-                                    <button class="btn btn-danger btn-sm clear-rental-btn" data-id="${rental._id}" data-completed="true">
-                                        Clear Rental
-                                    </button>
-                                    <button class="btn btn-info btn-sm extend-rental-btn" data-id="${rental._id}">
-                                        Extend
-                                    </button>
-                                    <button class="btn btn-secondary btn-sm add-notes-btn" data-id="${rental._id}">
-                                        Add Notes
-                                    </button>
-                                ` : `
-                                    <button class="btn btn-success btn-sm complete-rental-btn" data-id="${rental._id}">
-                                        Completed
-                                    </button>
-                                    <button class="btn btn-danger btn-sm overdue-rental-btn" data-id="${rental._id}">
-                                        Overdue
-                                    </button>
-                                    <button class="btn btn-info btn-sm extend-rental-btn" data-id="${rental._id}">
-                                        Extend
-                                    </button>
-                                    <button class="btn btn-secondary btn-sm add-notes-btn" data-id="${rental._id}">
-                                        Add Notes
-                                    </button>
-                                `}
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            activeRentalsHtml += '</div>';
+        
+        // Update available cars list (if it exists on the dashboard)
+        if ($('#availableCarsContent').length) {
+          updateAvailableCarsList(availableCars);
         }
-        $('#activeRentalsContent').html(activeRentalsHtml);
-    }).fail(function(error) {
-        console.error('Error loading dashboard:', error);
-        $('#availableCarsContent').html('<div class="alert alert-danger">Failed to load available cars</div>');
-        $('#activeRentalsContent').html('<div class="alert alert-danger">Failed to load active rentals</div>');
+      });
     });
   }
 
@@ -172,8 +82,23 @@ const Dashboard = (function() {
     });
   }
 
+  // Add refresh method to be called after adding a rental
+  function refreshDashboard() {
+    loadDashboard();
+  }
+
+  // Public interface
   return {
-    loadDashboard: loadDashboard,
-    loadAvailableCars: loadAvailableCars
+    init: function() {
+      loadDashboard();
+      setupEventHandlers();
+    },
+    refreshDashboard: function() {
+      loadDashboard();
+    },
+    loadSummaryStats: function() {
+      // If you have this function
+      loadSummaryStats();
+    }
   };
 })(); 

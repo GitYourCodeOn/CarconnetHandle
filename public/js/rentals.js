@@ -8,19 +8,42 @@ const Rentals = (function() {
 
   // Load all rentals and display them in the table
   function loadRentals() {
-    console.log('Loading rentals...');
-    $.get('/api/rentals', function(rentals) {
-      console.log('Rentals received:', rentals.length);
-      updateRentalsTable(rentals);
-    }).fail(function(error) {
-      console.error('Failed to load rentals:', error);
-      Main.showAlert('Failed to load rentals.', 'danger');
-    });
+    console.log('Loading rentals data...');
+    // Show loading indicator
+    $('#allRentalsTable tbody').html('<tr><td colspan="10" class="text-center">Loading rentals...</td></tr>');
+    
+    // Fetch rentals from API
+    fetch('/api/rentals')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Rentals loaded:', data.length);
+        if (data && data.length > 0) {
+          updateRentalsTable(data);
+        } else {
+          $('#allRentalsTable tbody').html('<tr><td colspan="10" class="text-center">No rentals found</td></tr>');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading rentals:', error);
+        $('#allRentalsTable tbody').html('<tr><td colspan="10" class="text-center text-danger">Failed to load rentals</td></tr>');
+      });
   }
 
   // Update the rentals table with the latest data
   function updateRentalsTable(rentals) {
-    let rows = '';
+    console.log('Updating rentals table with data:', rentals);
+    const tableBody = $('#allRentalsTable tbody');
+    tableBody.empty();
+    
+    if (!rentals || rentals.length === 0) {
+      tableBody.html('<tr><td colspan="10" class="text-center">No rentals found</td></tr>');
+      return;
+    }
     
     rentals.forEach(function(rental) {
       // Determine rental status
@@ -28,10 +51,10 @@ const Rentals = (function() {
       let statusText = 'Unknown';
       
       const today = new Date();
-      const startDate = new Date(rental.startDate);
-      const endDate = new Date(rental.endDate);
+      const startDate = new Date(rental.rentalDate || rental.startDate);
+      const endDate = new Date(rental.returnDate || rental.endDate);
       
-      if (rental.returnDate) {
+      if (rental.returned) {
         statusClass = 'badge-success';
         statusText = 'Returned';
       } else if (today > endDate) {
@@ -45,46 +68,83 @@ const Rentals = (function() {
         statusText = 'Upcoming';
       }
       
-      // Load car and customer details
-      let carInfo = 'Loading...';
-      let customerInfo = 'Loading...';
-      
-      if (rental.carDetails) {
-        carInfo = `${rental.carDetails.make} ${rental.carDetails.model} (${rental.carDetails.registration || 'No Reg'})`;
+      // Handle car data - different possible structures
+      let carInfo = 'Unknown Car';
+      if (rental.car) {
+        if (typeof rental.car === 'object') {
+          // If car is populated object
+          carInfo = `${rental.car.make || ''} ${rental.car.model || ''} ${rental.car.registration ? `(${rental.car.registration})` : ''}`;
+        } else {
+          // If car is just an ID
+          carInfo = `Car #${rental.car}`;
+        }
       }
       
-      if (rental.customerDetails) {
-        customerInfo = rental.customerDetails.name;
+      // Handle customer data
+      let customerName = rental.customerName || 'Unknown';
+      let customerContact = rental.customerNumber || rental.customerEmail || '';
+      
+      // Calculate duration
+      const durationDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 0;
+      
+      // Calculate time remaining (for active rentals)
+      let timeRemaining = '';
+      if (!rental.returned && today <= endDate) {
+        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        timeRemaining = remainingDays > 0 ? `${remainingDays} days` : 'Due today';
+      } else if (!rental.returned && today > endDate) {
+        const overdueDays = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
+        timeRemaining = `${overdueDays} days overdue`;
+      } else {
+        timeRemaining = statusText;
       }
       
-      rows += `
-        <tr>
+      // Format dates
+      const formattedStartDate = startDate && !isNaN(startDate) ? startDate.toLocaleDateString() : 'Invalid date';
+      const formattedEndDate = endDate && !isNaN(endDate) ? endDate.toLocaleDateString() : 'Invalid date';
+      
+      // Format fee
+      const rentalFee = rental.rentalFee || rental.dailyRate || 0;
+      const formattedFee = !isNaN(rentalFee) ? `ZMW ${parseFloat(rentalFee).toFixed(2)}` : 'ZMW -';
+      
+      // Handle documents/notes
+      const hasDocuments = rental.documents && rental.documents.length > 0;
+      const hasNotes = rental.note && rental.note.trim().length > 0;
+      const docsNotesHtml = `
+        ${hasDocuments ? '<i class="fas fa-file-alt mr-2" title="Has documents"></i>' : ''}
+        ${hasNotes ? '<i class="fas fa-sticky-note" title="Has notes"></i>' : ''}
+      `;
+      
+      const row = `
+        <tr data-rental-id="${rental._id}">
           <td>${carInfo}</td>
-          <td>${customerInfo}</td>
-          <td>${Main.formatDate(rental.startDate)}</td>
-          <td>${Main.formatDate(rental.endDate)}</td>
-          <td>${Main.formatMoney(rental.totalAmount)}</td>
-          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td>${customerName}</td>
+          <td>${customerContact}</td>
+          <td>${formattedStartDate}</td>
+          <td>${formattedEndDate}</td>
+          <td>${formattedFee}</td>
+          <td>${durationDays} days</td>
+          <td>${timeRemaining}</td>
+          <td>${docsNotesHtml}</td>
           <td>
             <div class="dropdown">
-              <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown${rental._id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Actions
               </button>
-              <div class="dropdown-menu">
+              <div class="dropdown-menu" aria-labelledby="actionsDropdown${rental._id}">
                 <a class="dropdown-item view-rental-btn" href="#" data-id="${rental._id}">View Details</a>
                 <a class="dropdown-item edit-rental-btn" href="#" data-id="${rental._id}">Edit</a>
-                ${!rental.returnDate ? 
-                  `<a class="dropdown-item return-rental-btn" href="#" data-id="${rental._id}">Mark Returned</a>` : ''}
+                ${!rental.returned ? `<a class="dropdown-item return-rental-btn" href="#" data-id="${rental._id}">Mark Returned</a>` : ''}
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item delete-rental-btn" href="#" data-id="${rental._id}">Delete</a>
+                <a class="dropdown-item delete-rental-btn text-danger" href="#" data-id="${rental._id}">Delete</a>
               </div>
             </div>
           </td>
         </tr>
       `;
+      
+      tableBody.append(row);
     });
-    
-    $('#rentalsTable tbody').html(rows);
   }
 
   // Load rental details for view/edit

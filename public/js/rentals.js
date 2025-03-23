@@ -270,63 +270,39 @@ const Rentals = (function() {
     $('#addRentalForm').submit(function(e) {
       e.preventDefault();
       
-      // Validate required fields
-      const carId = $('#rentalCarId').val();
-      const customerId = $('#rentalCustomerId').val();
-      const startDateStr = $('#rentalStartDate').val();
-      const endDateStr = $('#rentalEndDate').val();
-      const dailyRate = parseFloat($('#rentalDailyRate').val());
+      // Get the required fields
+      const car = $('select[name="car"]').val();
+      const rentalFee = $('input[name="rentalFee"]').val();
+      const startDate = $('input[name="rentalDate"]').val();
+      const returnDate = $('input[name="returnDate"]').val();
+      const customerName = $('input[name="customerName"]').val();
+      const customerPhone = $('input[name="customerNumber"]').val();
       
-      if (!carId || !customerId || !startDateStr || !endDateStr || isNaN(dailyRate)) {
-        Main.showAlert('Please fill in all required fields', 'danger');
+      // Validate only the mandatory fields
+      if (!car || !rentalFee || !startDate || !returnDate || !customerName || !customerPhone) {
+        Main.showAlert('Please fill in all required fields: Car, Rental Fee, Dates, Customer Name, and Phone', 'danger');
         return;
       }
       
-      // Format dates properly
-      const startDate = formatDateForAPI(startDateStr);
-      const endDate = formatDateForAPI(endDateStr);
-      
-      if (!startDate || !endDate) {
-        Main.showAlert('Invalid date format', 'danger');
-        return;
-      }
-      
-      // Calculate duration and total
-      const diffTime = Math.abs(new Date(endDate) - new Date(startDate));
-      const duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const totalAmount = (duration * dailyRate).toFixed(2);
-      
-      // Get form data
-      const rentalData = {
-        carId: carId,
-        customerId: customerId,
-        startDate: startDate,
-        endDate: endDate,
-        dailyRate: dailyRate,
-        duration: duration,
-        totalAmount: totalAmount,
-        notes: $('#rentalNotes').val()
-        // Do not include returnDate for new rentals
-      };
+      // Prepare form data
+      const formData = new FormData(document.getElementById('addRentalForm'));
       
       // Submit the form
       $.ajax({
         url: '/api/rentals',
-        method: 'POST',
-        data: JSON.stringify(rentalData),
-        contentType: 'application/json',
-        success: function() {
-          // Reset form and close modal
-          $('#addRentalForm')[0].reset();
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
           $('#addRentalModal').modal('hide');
-          
-          // Refresh rentals
-          loadRentals();
-          Main.showAlert('Rental added successfully', 'success');
+          Main.showAlert('Rental created successfully!', 'success');
+          Rentals.loadRentals();
+          document.getElementById('addRentalForm').reset();
         },
         error: function(xhr, status, error) {
-          console.error('Error adding rental:', xhr.responseText);
-          Main.showAlert(`Failed to add rental: ${xhr.responseJSON?.message || error}`, 'danger');
+          console.error('Error creating rental:', error);
+          Main.showAlert('Failed to create rental: ' + (xhr.responseJSON?.message || error), 'danger');
         }
       });
     });

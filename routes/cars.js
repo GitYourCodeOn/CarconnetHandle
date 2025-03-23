@@ -80,7 +80,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.array('documents', 10), async (req, res) => {
   try {
     const {
-      make, model, year, mileage, registration,
+      make, model, year, mileage, registration, colour,
       ownerName, ownerContact, ownerEmail, notes,
       serviceDue, taxDate, insuranceDate, tireChangeDate, registrationDate,
       customReminderTitle, customReminderDate
@@ -156,6 +156,7 @@ router.post('/', upload.array('documents', 10), async (req, res) => {
       year: year ? parseInt(year) : undefined,
       mileage: mileage ? parseInt(mileage) : undefined,
       registration,
+      colour,
       owner: {
         name: ownerName,
         contact: ownerContact,

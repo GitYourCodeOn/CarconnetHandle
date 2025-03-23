@@ -32,6 +32,12 @@
     <div class="row">
       <div class="col-md-3">
         <div class="form-group">
+          <label>Colour</label>
+          <input type="text" class="form-control" name="colour" placeholder="Car Colour">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
           <label>Mileage</label>
           <input type="number" class="form-control" name="mileage" placeholder="Mileage" required>
         </div>
@@ -46,12 +52,6 @@
         <div class="form-group">
           <label>Owner Contact</label>
           <input type="text" class="form-control" name="ownerContact" placeholder="Owner Contact">
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="form-group">
-          <label>Owner Email</label>
-          <input type="email" class="form-control" name="ownerEmail" placeholder="Owner Email">
         </div>
       </div>
     </div>
@@ -216,6 +216,10 @@
             
             <!-- Right column -->
             <div class="col-12 col-md-6 col-desktop">
+              <div class="form-group">
+                <label for="carColour">Colour</label>
+                <input type="text" class="form-control" id="carColour" name="colour" placeholder="Car Colour">
+              </div>
               <div class="form-group">
                 <label for="carMileage">Mileage</label>
                 <input type="number" class="form-control" id="carMileage" placeholder="Current mileage">

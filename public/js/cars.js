@@ -61,59 +61,62 @@ const Cars = (function() {
   // Load cars and update dropdowns and the cars table with the spanner button.
   function loadCars() {
     console.log('Loading cars for dropdowns...');
-    $.get('/api/cars', function(data) {
-      console.log('Cars received:', data.length, 'cars');
-      let rows = '';
-      let options = '<option value="">Select Car</option>';
-      data.forEach(function(car) {
-        // Determine the spanner button color based on all reminder dates.
-        const colorClass = getReminderColor(car);
-        rows += `<tr>
-          <td>${car.make}</td>
-          <td>${car.model}</td>
-          <td>${car.year || ''}</td>
-          <td>${car.registration || ''}</td>
-          <td>${car.mileage}</td>
-          <td>${car.ownerName || ''}</td>
-          <td>
-            <button class="btn btn-sm spanner-btn ${colorClass} text-white" data-id="${car._id}" data-car='${JSON.stringify(car)}'>
-              🔧
-            </button>
-          </td>
-          <td>
-            ${car.documents && car.documents.length ? 
-              `<button class="btn btn-sm btn-info view-car-docs-btn" data-id="${car._id}">
-                <i class="fas fa-file mr-1"></i> View (${car.documents.length})
-              </button>` : 
-              `<button class="btn btn-sm btn-outline-secondary add-car-docs-btn" data-id="${car._id}">
-                <i class="fas fa-plus mr-1"></i> Add
-              </button>`
-            }
-          </td>
-          <td>
-            <div class="dropdown">
-              <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                Actions
+    fetch('/api/cars')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Cars received:', data.length, 'cars');
+        let rows = '';
+        let options = '<option value="">Select a car</option>';
+        data.forEach(function(car) {
+          // Determine the spanner button color based on all reminder dates.
+          const colorClass = getReminderColor(car);
+          rows += `<tr>
+            <td>${car.make}</td>
+            <td>${car.model}</td>
+            <td>${car.year || ''}</td>
+            <td>${car.registration || ''}</td>
+            <td>${car.mileage}</td>
+            <td>${car.ownerName || ''}</td>
+            <td>
+              <button class="btn btn-sm spanner-btn ${colorClass} text-white" data-id="${car._id}" data-car='${JSON.stringify(car)}'>
+                🔧
               </button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item view-car-btn" href="#" data-id="${car._id}">View Details</a>
-                <a class="dropdown-item edit-car-btn" href="#" data-id="${car._id}">Edit</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item delete-car-btn" href="#" data-id="${car._id}">Delete</a>
+            </td>
+            <td>
+              ${car.documents && car.documents.length ? 
+                `<button class="btn btn-sm btn-info view-car-docs-btn" data-id="${car._id}">
+                  <i class="fas fa-file mr-1"></i> View (${car.documents.length})
+                </button>` : 
+                `<button class="btn btn-sm btn-outline-secondary add-car-docs-btn" data-id="${car._id}">
+                  <i class="fas fa-plus mr-1"></i> Add
+                </button>`
+              }
+            </td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                  Actions
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item view-car-btn" href="#" data-id="${car._id}">View Details</a>
+                  <a class="dropdown-item edit-car-btn" href="#" data-id="${car._id}">Edit</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item delete-car-btn" href="#" data-id="${car._id}">Delete</a>
+                </div>
               </div>
-            </div>
-          </td>
-        </tr>`;
-        options += `<option value="${car._id}">${car.make} ${car.model} (${car.year || ''})</option>`;
+            </td>
+          </tr>`;
+          options += `<option value="${car._id}">${car.make} ${car.model} (${car.registration || ''})${car.colour ? ' - ' + car.colour : ''}</option>`;
+        });
+        $('#carsTable tbody').html(rows);
+        // Update all car dropdowns (in rentals and finances)
+        $('select[name="car"]').html(options);
+        console.log('Updated car dropdowns with', data.length, 'options');
+      })
+      .catch(error => {
+        console.error('Failed to load cars:', error);
+        alert('Failed to load cars.');
       });
-      $('#carsTable tbody').html(rows);
-      // Update all car dropdowns (in rentals and finances)
-      $('select[name="car"]').html(options);
-      console.log('Updated car dropdowns with', data.length, 'options');
-    }).fail(function(error) {
-      console.error('Failed to load cars:', error);
-      alert('Failed to load cars.');
-    });
   }
 
   // Updates the cars table with the latest data.

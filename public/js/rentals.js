@@ -653,12 +653,123 @@ const Rentals = (function() {
         }
       });
     });
+
+    // Apply rental filters
+    $('#applyRentalFilters').on('click', function() {
+      applyRentalFilters();
+    });
+
+    // Reset rental filters
+    $('#resetRentalFilters').on('click', function() {
+      $('#rentalStatusFilter').val('all');
+      $('#rentalSearchFilter').val('');
+      applyRentalFilters(); // Apply the reset filters
+    });
+
+    // Also filter when status is changed (for better UX)
+    $('#rentalStatusFilter').on('change', function() {
+      applyRentalFilters();
+    });
+
+    // Enable filtering as user types (optional, for better UX)
+    $('#rentalSearchFilter').on('keyup', function() {
+      if ($(this).val().length > 2 || $(this).val().length === 0) {
+        applyRentalFilters();
+      }
+    });
+  }
+
+  // New separate function for applying filters
+  function applyRentalFilters() {
+    const statusFilter = $('#rentalStatusFilter').val();
+    const searchQuery = $('#rentalSearchFilter').val().toLowerCase().trim();
+    
+    console.log('Filtering rentals by:', { status: statusFilter, search: searchQuery });
+    
+    let filteredCount = 0;
+    const rows = $('#allRentalsTable tbody tr');
+    
+    rows.each(function() {
+      const row = $(this);
+      let visible = true;
+      
+      // Skip the "No rentals found" row
+      if (row.find('td').length === 1 && row.find('td').attr('colspan')) {
+        return;
+      }
+      
+      // Status filtering
+      if (statusFilter !== 'all') {
+        const statusBadge = row.find('.badge').text().toLowerCase();
+        
+        switch(statusFilter) {
+          case 'active':
+            if (statusBadge !== 'active') visible = false;
+            break;
+          case 'completed':
+            if (statusBadge !== 'returned') visible = false;
+            break;
+          case 'overdue':
+            if (statusBadge !== 'overdue') visible = false;
+            break;
+        }
+      }
+      
+      // Text search filtering
+      if (searchQuery && visible) {
+        const carText = row.find('td:nth-child(1)').text().toLowerCase();
+        const customerText = row.find('td:nth-child(2)').text().toLowerCase();
+        const contactText = row.find('td:nth-child(3)').text().toLowerCase();
+        
+        const matches = carText.includes(searchQuery) || 
+                       customerText.includes(searchQuery) || 
+                       contactText.includes(searchQuery);
+        
+        if (!matches) visible = false;
+      }
+      
+      // Show/hide the row based on filter results
+      if (visible) {
+        row.show();
+        filteredCount++;
+      } else {
+        row.hide();
+      }
+    });
+    
+    // Show a message if no results were found
+    if (filteredCount === 0 && rows.length > 0) {
+      // Only add the "no results" row if it doesn't already exist
+      if ($('#allRentalsTable tbody tr.no-results').length === 0) {
+        $('#allRentalsTable tbody').append(`
+          <tr class="no-results">
+            <td colspan="10" class="text-center">
+              No rentals match your filter criteria. 
+              <button class="btn btn-sm btn-link" id="clearFilters">Clear filters</button>
+            </td>
+          </tr>
+        `);
+        
+        // Add event handler for the "Clear filters" button
+        $('#clearFilters').on('click', function() {
+          $('#rentalStatusFilter').val('all');
+          $('#rentalSearchFilter').val('');
+          applyRentalFilters();
+        });
+      }
+    } else {
+      // Remove the "no results" row if it exists
+      $('#allRentalsTable tbody tr.no-results').remove();
+    }
+    
+    console.log(`Filtered rentals: ${filteredCount} of ${rows.length} shown`);
   }
 
   // Return public methods
   return {
     init: init,
     loadRentals: loadRentals,
-    updateRentalsTable: updateRentalsTable
+    updateRentalsTable: updateRentalsTable,
+    applyRentalFilters: applyRentalFilters
   };
 })(); 

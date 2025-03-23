@@ -12,11 +12,55 @@
   <link rel="stylesheet" href="css/style.css">
   <!-- Responsive CSS for mobile-friendly design -->
   <style>
+    /* App header/title */
+    .app-header {
+      background: #4e73df;
+      color: white;
+      padding: 10px 15px;
+      text-align: center;
+      margin-bottom: 0;
+    }
+    
+    /* Mobile navigation adjustments */
+    .mobile-nav-container {
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      background-color: #f8f9fa;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+    
+    .mobile-top-nav {
+      display: flex;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .mobile-top-nav .nav-item {
+      flex: 0 0 auto;
+    }
+    
+    .mobile-top-nav .nav-link {
+      padding: 12px 20px;
+      font-size: 16px;
+      color: #495057;
+      text-align: center;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .mobile-top-nav .nav-link.active {
+      color: #4e73df;
+      border-bottom-color: #4e73df;
+      font-weight: 600;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
-      .nav-tabs .nav-item {
-        flex: 1 1 auto;
-        text-align: center;
+      .desktop-tabs {
+        display: none;
       }
       
       .table-responsive {
@@ -52,14 +96,12 @@
         padding-right: 5px;
         padding-left: 5px;
       }
-    }
-    
-    /* Scrollable tabs for mobile */
-    .nav-tabs-scroll {
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
+      
+      /* Make tab content full screen on mobile */
+      .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
     }
     
     /* General improvements */
@@ -77,9 +119,42 @@
   </style>
 </head>
 <body>
+  <!-- App Header -->
+  <h1 class="app-header">ZMW 3.00</h1>
+  
+  <!-- Mobile Top Navigation -->
+  <div class="mobile-nav-container d-block d-md-none">
+    <ul class="mobile-top-nav" id="mobileTopNav">
+      <li class="nav-item">
+        <a class="nav-link active" id="mobile-dashboard-tab" href="#dashboard" data-tab-id="dashboard-tab">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-cars-tab" href="#cars" data-tab-id="cars-tab">Cars</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-rentals-tab" href="#rentals" data-tab-id="rentals-tab">Rentals</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-reminders-tab" href="#reminders" data-tab-id="reminders-tab">Reminders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-data-tab" href="#data" data-tab-id="data-tab">Data</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-marketing-tab" href="#marketing" data-tab-id="marketing-tab">Marketing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-finances-tab" href="#finances" data-tab-id="finances-tab">Finances</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="mobile-settings-tab" href="#settings" data-tab-id="settings-tab">Settings</a>
+      </li>
+    </ul>
+  </div>
+  
   <div class="container-fluid">
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs nav-tabs-scroll mb-3" id="mainTabs" role="tablist">
+    <!-- Navigation Tabs (Desktop) -->
+    <ul class="nav nav-tabs nav-tabs-scroll mb-3 desktop-tabs d-none d-md-flex" id="mainTabs" role="tablist">
       <li class="nav-item">
         <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab">Dashboard</a>
       </li>
@@ -212,14 +287,28 @@
       // Load modals
       $('#modalsContainer').load('modals.html');
       
-      // Handle tab clicks to refresh data
+      // Handle desktop tab clicks to refresh data
       $('#mainTabs a').on('click', function(e) {
         e.preventDefault();
         $(this).tab('show');
+        updateActiveTab($(this).attr('id'));
+      });
+      
+      // Handle mobile nav clicks to activate tabs
+      $('#mobileTopNav a').on('click', function(e) {
+        e.preventDefault();
+        const tabId = $(this).data('tab-id');
+        $(`#${tabId}`).tab('show');
+        updateActiveTab(tabId);
+      });
+      
+      // Function to update active state in both navigation menus
+      function updateActiveTab(tabId) {
+        // Update mobile nav active state
+        $('#mobileTopNav a').removeClass('active');
+        $(`#mobile-${tabId.replace('-tab', '')}-tab`).addClass('active');
         
         // Call appropriate module initialization based on tab ID
-        const tabId = $(this).attr('id');
-        
         if (tabId === 'dashboard-tab') {
           Dashboard.refresh();
         }
@@ -244,7 +333,7 @@
         else if (tabId === 'settings-tab') {
           Settings.loadSettings();
         }
-      });
+      }
     });
   </script>
 </body>

@@ -1514,11 +1514,49 @@
         </button>
       </div>
       <div class="modal-body">
-        <!-- Documents will be loaded here -->
+        <!-- Document previews will be displayed here -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Documents Modal -->
+<div class="modal fade" id="addDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="addDocumentsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="addDocumentsForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addDocumentsModalLabel">Add Documents to Rental</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Error message area -->
+          <div id="documentError" class="alert alert-danger" style="display: none;"></div>
+          
+          <input type="hidden" name="rentalId" id="documentsRentalId">
+          
+          <div class="form-group">
+            <label><i class="fas fa-file-upload mr-2"></i>Upload Documents</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="rentalDocuments" name="documents" multiple accept="image/*">
+              <label class="custom-file-label" for="rentalDocuments">Choose documents...</label>
+            </div>
+            <small class="form-text text-muted">You can select multiple documents/images</small>
+            <div id="documentPreview" class="mt-3 row">
+              <!-- Document previews will be added here -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Upload Documents</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -1991,7 +2029,10 @@
                 ${documentsCount > 0 ? `
                   <button class="btn btn-sm btn-info mb-1 view-documents-btn" data-id="${rental._id}">
                     <i class="fas fa-file mr-1"></i> ${documentsCount} Document${documentsCount !== 1 ? 's' : ''}
-                  </button>` : ''}
+                  </button>` : `
+                  <button class="btn btn-sm btn-outline-secondary mb-1 add-documents-btn" data-id="${rental._id}">
+                    <i class="fas fa-file-upload mr-1"></i> Documents
+                  </button>`}
                 ${hasNotes ? `
                   <button class="btn btn-sm btn-secondary mb-1 view-notes-btn" data-id="${rental._id}" data-notes="${rental.note || ''}">
                     <i class="fas fa-sticky-note mr-1"></i> View Notes
@@ -2003,6 +2044,9 @@
           } else {
             docsNotesHtml = `
               <div class="d-flex flex-column">
+                <button class="btn btn-sm btn-outline-secondary mb-1 add-documents-btn" data-id="${rental._id}">
+                  <i class="fas fa-file-upload mr-1"></i> Documents
+                </button>
                 <button class="btn btn-sm btn-outline-secondary add-notes-btn" data-id="${rental._id}">
                   <i class="fas fa-plus-circle mr-1"></i> Add Note
                 </button>
@@ -2049,6 +2093,9 @@
                   </a>
                   <a class="dropdown-item add-notes-btn" href="#" data-id="${rental._id}">
                     <i class="fas fa-sticky-note text-secondary mr-2"></i>Add Notes
+                  </a>
+                  <a class="dropdown-item add-documents-btn" href="#" data-id="${rental._id}">
+                    <i class="fas fa-file-upload text-info mr-2"></i>Documents
                   </a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item view-rental-btn" href="#" data-id="${rental._id}">
@@ -4173,12 +4220,41 @@
         modalBody.append(documentsRow);
       }
       
+      // Add an "Add More Documents" button
+      const addMoreBtn = $(`
+        <div class="text-center mt-3">
+          <button class="btn btn-primary add-more-documents-btn" data-id="${rentalId}">
+            <i class="fas fa-plus-circle mr-1"></i> Add More Documents
+          </button>
+        </div>
+      `);
+      modalBody.append(addMoreBtn);
+      
       // Show the modal
       $('#viewDocumentsModal').modal('show');
     }).fail(function(error) {
       console.error('Error fetching documents:', error);
       alert('Failed to load documents');
     });
+  });
+
+  // Handle Add More Documents button click
+  $(document).on('click', '.add-more-documents-btn', function() {
+    const rentalId = $(this).data('id');
+    
+    // Close the view documents modal
+    $('#viewDocumentsModal').modal('hide');
+    
+    // Trigger the add documents workflow with the rental ID
+    setTimeout(function() {
+      // Set the rental ID and show the add documents modal
+      $('#documentsRentalId').val(rentalId);
+      $('#rentalDocuments').val('');
+      $('.custom-file-label').text('Choose documents...');
+      $('#documentPreview').empty();
+      $('#documentError').hide();
+      $('#addDocumentsModal').modal('show');
+    }, 500); // Short delay to allow the first modal to close
   });
 
   // Handle filter buttons in Data tab
@@ -5186,6 +5262,118 @@
   // Reset modal to default tab when closed
   $('#carDetailsModal').on('hidden.bs.modal', function() {
     $('#car-details-tab').tab('show');
+  });
+
+  // Handle Add Documents button click
+  $(document).on('click', '.add-documents-btn', function() {
+    const rentalId = $(this).data('id');
+    
+    // Set the rental ID and show the modal
+    $('#documentsRentalId').val(rentalId);
+    $('#rentalDocuments').val('');
+    $('.custom-file-label').text('Choose documents...');
+    $('#documentPreview').empty();
+    $('#documentError').hide();
+    $('#addDocumentsModal').modal('show');
+  });
+
+  // Document ready function
+  $(document).ready(function() {
+    // Set up the file input preview functionality for documents
+    $(document).on('change', '#rentalDocuments', function() {
+      const fileList = this.files;
+      const label = $(this).next('.custom-file-label');
+      
+      if (fileList.length > 0) {
+        label.text(fileList.length === 1 ? fileList[0].name : `${fileList.length} files selected`);
+        
+        // Clear previous previews
+        $('#documentPreview').empty();
+        
+        // Create previews for each file
+        Array.from(fileList).forEach(file => {
+          if (file.type.match('image.*')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              $('#documentPreview').append(`
+                <div class="col-md-4 mb-2">
+                  <div class="card">
+                    <img src="${e.target.result}" class="card-img-top" alt="Document preview">
+                    <div class="card-body p-2">
+                      <p class="card-text small text-truncate">${file.name}</p>
+                    </div>
+                  </div>
+                </div>
+              `);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            $('#documentPreview').append(`
+              <div class="col-md-4 mb-2">
+                <div class="card">
+                  <div class="card-body p-2 text-center">
+                    <i class="far fa-file fa-3x mb-2"></i>
+                    <p class="card-text small text-truncate">${file.name}</p>
+                  </div>
+                </div>
+              </div>
+            `);
+          }
+        });
+      } else {
+        label.text('Choose documents...');
+        $('#documentPreview').empty();
+      }
+    });
+    
+    // Handle document upload form submission
+    $(document).on('submit', '#addDocumentsForm', function(e) {
+      e.preventDefault();
+      
+      const rentalId = $('#documentsRentalId').val();
+      const formData = new FormData(this);
+      
+      // Show loading state
+      $(this).find('button[type="submit"]').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...').prop('disabled', true);
+      
+      $.ajax({
+        url: `/api/rentals/${rentalId}/documents`,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          $('#addDocumentsModal').modal('hide');
+          // Refresh the rental list to show updated document status
+          loadRentals();
+          
+          // Show success toast
+          showToast('Documents uploaded successfully', 'success');
+        },
+        error: function(xhr, status, error) {
+          let errorMsg = 'Error uploading documents. Please try again.';
+          
+          try {
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseText) {
+              const response = JSON.parse(xhr.responseText);
+              if (response.message) {
+                errorMsg = response.message;
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing error response:', e);
+          }
+          
+          $('#documentError').html(errorMsg).show();
+        },
+        complete: function() {
+          // Reset button state
+          $('#addDocumentsForm').find('button[type="submit"]').html('Upload Documents').prop('disabled', false);
+        }
+      });
+    });
   });
 </script>
 </body>

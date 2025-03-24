@@ -202,12 +202,12 @@ router.delete('/:id/documents/:docId', async (req, res) => {
   }
 });
 
-// GET /api/rentals/active - Retrieve all active rentals (populated with car details)
+// GET /api/rentals/active - Retrieve all active rentals
 router.get('/active', async (req, res) => {
   try {
-    // Only return active rentals that haven't been cleared from dashboard
     const rentals = await Rental.find({ 
       active: true,
+      returned: { $ne: true }, // Exclude returned rentals
       clearedFromDashboard: { $ne: true } 
     }).populate('car');
     res.json(rentals);
@@ -217,13 +217,22 @@ router.get('/active', async (req, res) => {
   }
 });
 
-// GET /api/rentals - Retrieve all rentals (active and ended), populated with car details
+// GET /api/rentals - Retrieve all rentals
 router.get('/', async (req, res) => {
   try {
     const rentals = await Rental.find()
       .populate('car', 'make model year')
-      .sort({ rentalDate: -1 });
-    res.json(rentals);
+      .sort({ rentalDate: -1 })
+      .select('-__v')
+      .lean(); // Convert to plain JS object
+    
+    // Add returned status to all rentals
+    const processedRentals = rentals.map(rental => ({
+      ...rental,
+      returned: rental.returned || (!rental.active && rental.returnDate < new Date())
+    }));
+
+    res.json(processedRentals);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching rentals' });
@@ -521,7 +530,7 @@ router.post('/:id/complete', async (req, res) => {
   }
 });
 
-// Add this route handler for marking rentals as returned
+// PUT /api/rentals/:id/return - Mark rental as returned
 router.put('/:id/return', async (req, res) => {
     try {
         const rental = await Rental.findById(req.params.id);
@@ -532,15 +541,29 @@ router.put('/:id/return', async (req, res) => {
             });
         }
 
-        // Update rental status
+        // Permanent status changes
         rental.returned = true;
+        rental.active = false;
         rental.returnDate = new Date();
         rental.rating = req.body.rating || 'good';
         rental.comment = req.body.comment || '';
         
-        // Update associated car availability
+        // Add permanent return note
+        const returnNote = {
+            content: `Vehicle returned ${req.body.comment ? 'with notes' : ''}`,
+            author: 'System',
+            timestamp: new Date()
+        };
+        
+        if (!rental.notes) rental.notes = [];
+        rental.notes.unshift(returnNote);
+
+        // Update car status
         if (rental.car) {
-            await Car.findByIdAndUpdate(rental.car, { isRented: false });
+            await Car.findByIdAndUpdate(rental.car, { 
+                isRented: false,
+                lastRented: rental.returnDate 
+            });
         }
 
         const updatedRental = await rental.save();

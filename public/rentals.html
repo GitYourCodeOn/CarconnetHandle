@@ -96,63 +96,52 @@
   <div class="rentals-list mt-5">
     <h3 class="mb-4">Rental Records</h3>
     
-    <!-- Rental records navigation tabs -->
-    <ul class="nav nav-tabs mb-3" id="rentalsRecordTabs">
-      <li class="nav-item">
-        <a class="nav-link active" id="all-rentals-tab" data-toggle="tab" href="#allRentalsTab">All Rentals</a>
-      </li>
-    </ul>
-    
-    <!-- Tab content -->
-    <div class="tab-content" id="rentalsRecordTabContent">
-      <!-- All Rentals Tab -->
-      <div class="tab-pane show active" id="allRentalsTab">
-        <div class="mb-3">
-          <div class="form-row align-items-center">
-            <div class="col-auto">
-              <label class="mr-2">Filter by:</label>
-            </div>
-            <div class="col-auto">
-              <select id="rentalStatusFilter" class="form-control form-control-sm">
-                <option value="all">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="completed">Completed</option>
-                <option value="overdue">Overdue</option>
-              </select>
-            </div>
-            <div class="col-auto">
-              <input type="text" id="rentalSearchFilter" class="form-control form-control-sm" placeholder="Search (car, customer, reg, email)">
-            </div>
-            <div class="col-auto">
-              <button id="applyRentalFilters" class="btn btn-sm btn-primary">Apply</button>
-              <button id="resetRentalFilters" class="btn btn-sm btn-secondary">Reset</button>
-            </div>
-            <div class="col-auto ml-auto">
-              <button id="exportRentals" class="btn btn-sm btn-success">
-                <i class="fas fa-file-export mr-1"></i> Export for Analysis
-              </button>
-            </div>
+    <div id="allRentalsTab">
+      <div class="mb-3">
+        <div class="form-row align-items-center">
+          <div class="col-auto">
+            <label class="mr-2">Filter by:</label>
+          </div>
+          <div class="col-auto">
+            <select id="rentalStatusFilter" class="form-control form-control-sm">
+              <option value="all">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <input type="text" id="rentalSearchFilter" class="form-control form-control-sm" placeholder="Search (car, customer, reg, email)">
+          </div>
+          <div class="col-auto">
+            <button id="applyRentalFilters" class="btn btn-sm btn-primary">Apply</button>
+            <button id="resetRentalFilters" class="btn btn-sm btn-secondary">Reset</button>
+          </div>
+          <div class="col-auto ml-auto">
+            <button id="exportRentals" class="btn btn-sm btn-success">
+              <i class="fas fa-file-export mr-1"></i> Export for Analysis
+            </button>
           </div>
         </div>
-        <div class="table-responsive">
-          <table class="table table-striped" id="allRentalsTable">
-            <thead>
-              <tr>
-                <th>Car</th>
-                <th>Customer</th>
-                <th>Contact</th>
-                <th>Start Date</th>
-                <th>Return Date</th>
-                <th>Rental Fee</th>
-                <th>Duration</th>
-                <th>Time Remaining</th>
-                <th>Documents & Notes</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped" id="allRentalsTable">
+          <thead>
+            <tr>
+              <th>Car</th>
+              <th>Customer</th>
+              <th>Contact</th>
+              <th>Start Date</th>
+              <th>Return Date</th>
+              <th>Rental Fee</th>
+              <th>Duration</th>
+              <th>Time Remaining</th>
+              <th>Documents & Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>

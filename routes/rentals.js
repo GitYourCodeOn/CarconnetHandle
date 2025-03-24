@@ -521,4 +521,43 @@ router.post('/:id/complete', async (req, res) => {
   }
 });
 
+// Add this route handler for marking rentals as returned
+router.put('/:id/return', async (req, res) => {
+    try {
+        const rental = await Rental.findById(req.params.id);
+        if (!rental) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Rental not found' 
+            });
+        }
+
+        // Update rental status
+        rental.returned = true;
+        rental.returnDate = new Date();
+        rental.rating = req.body.rating || 'good';
+        rental.comment = req.body.comment || '';
+        
+        // Update associated car availability
+        if (rental.car) {
+            await Car.findByIdAndUpdate(rental.car, { isRented: false });
+        }
+
+        const updatedRental = await rental.save();
+        
+        res.json({
+            success: true,
+            message: 'Rental marked as returned successfully',
+            rental: updatedRental
+        });
+    } catch (err) {
+        console.error('Error processing return:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error processing return',
+            error: err.message
+        });
+    }
+});
+
 module.exports = router;

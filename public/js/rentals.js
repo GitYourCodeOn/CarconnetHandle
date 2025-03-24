@@ -128,6 +128,22 @@ const Rentals = (function() {
         </div>
       `;
       
+      // Modified actions column
+      const actionsHtml = rental.returned 
+          ? `<button class="btn btn-outline-secondary" disabled>
+                <i class="fas fa-check"></i> Returned
+             </button>`
+          : `<div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Actions
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item mark-returned-btn" href="#" data-id="${rental._id}">Mark Returned</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item delete-rental-btn" href="#" data-id="${rental._id}">Delete</a>
+                </div>
+             </div>`;
+      
       const row = `
         <tr data-rental-id="${rental._id}">
           <td>${carInfo}</td>
@@ -142,23 +158,7 @@ const Rentals = (function() {
             <div class="mt-1">${statusLabel}</div>
           </td>
           <td>${docsNotesHtml}</td>
-          <td>
-            <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown${rental._id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Actions
-              </button>
-              <div class="dropdown-menu" aria-labelledby="actionsDropdown${rental._id}">
-                <a class="dropdown-item view-rental-btn" href="#" data-id="${rental._id}">View Details</a>
-                <a class="dropdown-item edit-rental-btn" href="#" data-id="${rental._id}">Edit</a>
-                ${!rental.returned ? `
-                  <a class="dropdown-item mark-returned-btn" href="#" data-id="${rental._id}">Mark Returned</a>
-                  <a class="dropdown-item mark-overdue-btn" href="#" data-id="${rental._id}">Mark Overdue</a>
-                ` : ''}
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item delete-rental-btn text-danger" href="#" data-id="${rental._id}">Delete</a>
-              </div>
-            </div>
-          </td>
+          <td>${actionsHtml}</td>
         </tr>
       `;
       
@@ -596,12 +596,64 @@ const Rentals = (function() {
       });
     }
 
-    // Mark as Returned with customer rating
+    // Update the mark returned click handler (around line 600)
     $(document).on('click', '.mark-returned-btn', function() {
       const rentalId = $(this).data('id');
-      // Show customer rating modal
+      const row = $(this).closest('tr');
+      
+      // Store references in the modal
       $('#returnRentalId').val(rentalId);
+      $('#returnRentalModal').data('row', row);
+      
+      // Reset the modal form
+      $('#returnRentalForm')[0].reset();
       $('#returnRentalModal').modal('show');
+    });
+
+    // Update the return rental form submission (around line 654)
+    $('#returnRentalForm').submit(function(e) {
+      e.preventDefault();
+      const rentalId = $('#returnRentalId').val();
+      const row = $('#returnRentalModal').data('row');
+      const rating = $('input[name="customerRating"]:checked').val();
+      const comment = $('#returnComment').val();
+
+      // Disable button during processing
+      const submitBtn = $(this).find('button[type="submit"]');
+      submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+
+      $.ajax({
+        url: `/api/rentals/${rentalId}/return`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          rating: rating,
+          comment: comment 
+        }),
+        success: function() {
+          // Update the UI directly
+          row.find('.badge')
+            .removeClass('badge-danger')
+            .addClass('badge-success')
+            .text('Returned');
+          
+          row.find('td:last-child').html(`
+            <button class="btn btn-outline-secondary" disabled>
+              <i class="fas fa-check"></i> Returned
+            </button>
+          `);
+
+          $('#returnRentalModal').modal('hide');
+          Main.showAlert('Rental marked as returned with customer rating', 'success');
+        },
+        error: function(error) {
+          console.error('Error processing rental return:', error);
+          Main.showAlert('Failed to process rental return', 'danger');
+        },
+        complete: function() {
+          submitBtn.prop('disabled', false).html('Complete Return');
+        }
+      });
     });
 
     // Mark as Overdue
@@ -624,34 +676,6 @@ const Rentals = (function() {
           }
         });
       }
-    });
-
-    // Submit customer rating when marking rental as returned
-    $('#returnRentalForm').submit(function(e) {
-      e.preventDefault();
-      
-      const rentalId = $('#returnRentalId').val();
-      const rating = $('input[name="customerRating"]:checked').val();
-      const comment = $('#returnComment').val();
-      
-      $.ajax({
-        url: `/api/rentals/${rentalId}/return`,
-        method: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          rating: rating,
-          comment: comment 
-        }),
-        success: function() {
-          $('#returnRentalModal').modal('hide');
-          loadRentals();
-          Main.showAlert('Rental marked as returned with customer rating', 'success');
-        },
-        error: function(error) {
-          console.error('Error processing rental return:', error);
-          Main.showAlert('Failed to process rental return', 'danger');
-        }
-      });
     });
 
     // Apply rental filters

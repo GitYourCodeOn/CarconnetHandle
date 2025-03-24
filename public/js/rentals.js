@@ -730,7 +730,7 @@ const Rentals = (function() {
           case 'active':
             if (statusBadge !== 'active') visible = false;
             break;
-          case 'completed':
+          case 'returned':
             if (statusBadge !== 'returned') visible = false;
             break;
           case 'overdue':

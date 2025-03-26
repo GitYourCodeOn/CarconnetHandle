@@ -1,3 +1,16 @@
+// Add this at the top of the file
+const SettingsManager = window.SettingsManager || {
+  getSetting: (key) => {
+    console.warn('SettingsManager not loaded, using default settings');
+    // Provide default settings
+    const defaults = {
+      currency: 'ZMW',
+      dateFormat: 'dd/MM/yyyy'
+    };
+    return defaults[key];
+  }
+};
+
 // Rentals module
 const Rentals = (function() {
   // Initialize rentals tab
@@ -810,7 +823,8 @@ const Rentals = (function() {
   }
 
   function formatCurrency(amount) {
-    return `${SettingsManager.getSetting('currency')}${parseFloat(amount).toFixed(2)}`;
+    const currency = SettingsManager.getSetting('currency') || 'ZMW';
+    return `${currency} ${amount.toFixed(2)}`;
   }
 
   // Return public methods

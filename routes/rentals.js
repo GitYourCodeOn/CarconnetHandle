@@ -340,16 +340,7 @@ router.post('/:id/notes', formParser, async (req, res) => {
     const { id } = req.params;
     const { noteContent, author } = req.body;
     
-    console.log('Received note request:', {
-      id,
-      body: req.body,
-      contentType: req.headers['content-type'],
-      noteContent,
-      author
-    });
-    
     if (!noteContent) {
-      console.log('Missing note content');
       return res.status(400).json({ 
         success: false, 
         message: 'Note content is required' 
@@ -385,13 +376,23 @@ router.post('/:id/notes', formParser, async (req, res) => {
       ? `${legacyNote}\n${rental.note}`
       : legacyNote;
     
-    await rental.save();
-    
-    res.json({ 
-      success: true,
-      message: 'Note added successfully', 
-      note: newNote
-    });
+    // Save with version control
+    try {
+      await rental.save();
+      res.json({ 
+        success: true,
+        message: 'Note added successfully', 
+        note: newNote
+      });
+    } catch (saveError) {
+      if (saveError.name === 'VersionError') {
+        return res.status(409).json({
+          success: false,
+          message: 'Version conflict - rental was modified by another user'
+        });
+      }
+      throw saveError;
+    }
   } catch (err) {
     console.error('Error adding note:', err);
     res.status(500).json({ 

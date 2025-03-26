@@ -2,9 +2,11 @@
 const Data = (function() {
   // Initialize the data tab
   function initializeData() {
-    console.log('Initializing data tab...');
+    console.log('Initializing Data module...');
     loadDataAnalytics();
     setupEventListeners();
+    loadRentalLogs();
+    setupSimpleEventHandlers();
   }
 
   // Load data analytics from localStorage or API
@@ -315,6 +317,206 @@ const Data = (function() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  function loadRentalLogs() {
+    console.log('Loading rental logs...');
+    $('#rentalLogsTable tbody').html('<tr><td colspan="9" class="text-center">Loading rentals...</td></tr>');
+    
+    fetch('/api/rentals')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Rental logs loaded:', data.length);
+        if (data && data.length > 0) {
+          updateRentalLogsTable(data);
+        } else {
+          $('#rentalLogsTable tbody').html('<tr><td colspan="9" class="text-center">No rentals found</td></tr>');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading rental logs:', error);
+        $('#rentalLogsTable tbody').html('<tr><td colspan="9" class="text-center text-danger">Failed to load rentals</td></tr>');
+      });
+  }
+
+  function updateRentalLogsTable(rentals) {
+    const tbody = $('#rentalLogsTable tbody');
+    tbody.empty();
+
+    rentals.forEach(rental => {
+      const startDate = new Date(rental.rentalDate || rental.startDate);
+      const endDate = new Date(rental.returnDate || rental.endDate);
+      const today = new Date();
+      
+      // Status calculation
+      let statusClass = 'badge-secondary';
+      let statusText = 'Unknown';
+      
+      if (rental.returned) {
+        statusClass = 'badge-success';
+        statusText = 'Returned';
+      } else if (today > endDate) {
+        statusClass = 'badge-danger';
+        statusText = 'Overdue';
+      } else if (today >= startDate && today <= endDate) {
+        statusClass = 'badge-primary';
+        statusText = 'Active';
+      } else if (today < startDate) {
+        statusClass = 'badge-info';
+        statusText = 'Upcoming';
+      }
+
+      // Car info
+      let carInfo = 'Unknown Car';
+      if (rental.car) {
+        if (typeof rental.car === 'object') {
+          carInfo = `${rental.car.make || ''} ${rental.car.model || ''} ${rental.car.registration ? `(${rental.car.registration})` : ''}`.trim();
+        } else {
+          carInfo = `Car #${rental.car}`;
+        }
+      }
+
+      // Calculate duration
+      const durationDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 0;
+
+      // Calculate time remaining
+      let timeRemaining = '';
+      if (!rental.returned) {
+        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        timeRemaining = remainingDays > 0 ? `${remainingDays} days` : 'Due today';
+        if (remainingDays < 0) {
+          timeRemaining = `${Math.abs(remainingDays)} days overdue`;
+        }
+      } else {
+        timeRemaining = 'Completed';
+      }
+
+      const row = `
+        <tr>
+          <td>${carInfo}</td>
+          <td>${rental.customerName || 'Unknown'}</td>
+          <td>${rental.customerPhone || rental.customerEmail || ''}</td>
+          <td>${startDate.toLocaleDateString()}</td>
+          <td>${endDate.toLocaleDateString()}</td>
+          <td>ZMW ${(rental.rentalFee || 0).toFixed(2)}</td>
+          <td>${durationDays} days</td>
+          <td>${timeRemaining}</td>
+          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td>
+            <button class="btn btn-sm btn-warning add-note-btn" data-id="${rental._id}">
+              <i class="fas fa-plus-circle"></i> Note
+            </button>
+            <button class="btn btn-sm btn-info add-document-btn" data-id="${rental._id}">
+              <i class="fas fa-upload"></i> Doc
+            </button>
+          </td>
+        </tr>`;
+      tbody.append(row);
+    });
+  }
+
+  function setupSimpleEventHandlers() {
+    // Note button click handler
+    $('#rentalLogsTable').on('click', '.add-note-btn', function() {
+        const rentalId = $(this).data('id');
+        console.log('Note button clicked for rental:', rentalId);
+        $('#dataAddNoteRentalId').val(rentalId);
+        loadRentalNotes(rentalId);
+        $('#dataAddNoteModal').modal('show');
+    });
+
+    // Save note handler with retry logic
+    $('#dataSaveNoteBtn').on('click', function() {
+        const rentalId = $('#dataAddNoteRentalId').val();
+        const noteContent = $('#dataNoteContent').val().trim();
+        
+        if (!noteContent) {
+            alert('Please enter a note');
+            return;
+        }
+
+        console.log('Saving note for rental:', rentalId);
+        
+        // Add loading state
+        $('#dataSaveNoteBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        
+        const saveNote = function(retryCount = 0) {
+            $.ajax({
+                url: `/api/rentals/${rentalId}/notes`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    noteContent: noteContent,
+                    author: 'User'
+                }),
+                success: function(response) {
+                    console.log('Note saved successfully:', response);
+                    $('#dataAddNoteModal').modal('hide');
+                    $('#dataNoteContent').val('');
+                    loadRentalLogs();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to save note:', error);
+                    if (xhr.status === 409 && retryCount < 3) {
+                        // Refresh and retry
+                        console.log('Version conflict, retrying...');
+                        loadRentalLogs().then(() => {
+                            setTimeout(() => saveNote(retryCount + 1), 1000);
+                        });
+                    } else {
+                        alert('Failed to save note: ' + (xhr.responseJSON?.message || 'Server error'));
+                    }
+                },
+                complete: function() {
+                    if (xhr.status !== 409 || retryCount >= 3) {
+                        $('#dataSaveNoteBtn').prop('disabled', false).html('Save Note');
+                    }
+                }
+            });
+        };
+
+        saveNote();
+    });
+
+    // Function to load existing notes
+    function loadRentalNotes(rentalId) {
+        $.get(`/api/rentals/${rentalId}/notes`, function(notes) {
+            const notesList = $('#dataAddNoteModal .existing-notes-list');
+            notesList.empty();
+            
+            if (notes && notes.length > 0) {
+                notes.forEach(note => {
+                    const date = new Date(note.timestamp).toLocaleString();
+                    notesList.append(`
+                        <div class="note-entry mb-2 p-2 border-left border-primary">
+                            <div class="note-content">${note.content}</div>
+                            <small class="text-muted">Added on ${date}</small>
+                        </div>
+                    `);
+                });
+            } else {
+                notesList.html('<p class="text-muted">No notes yet</p>');
+            }
+        });
+    }
+
+    // Add modal hidden event handler
+    $('#dataAddNoteModal').on('hidden.bs.modal', function () {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+    });
+
+    // Add close button handler
+    $('#dataAddNoteModal .close, #dataAddNoteModal .btn-secondary').on('click', function() {
+        $('#dataAddNoteModal').modal('hide');
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+    });
   }
 
   // Return public methods

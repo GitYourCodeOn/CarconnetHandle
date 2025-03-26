@@ -476,12 +476,64 @@ const Rentals = (function() {
       });
     });
 
-    // Add Note button
-    $(document).on('click', '.add-note-btn', function() {
-      const rentalId = $(this).data('id');
-      // Show note modal
-      $('#addNoteRentalId').val(rentalId);
-      $('#addNoteModal').modal('show');
+    // Note button click handler
+    $('#allRentalsTable').on('click', '.add-note-btn', function() {
+        const rentalId = $(this).data('id');
+        console.log('Note button clicked for rental:', rentalId);
+        $('#addNoteRentalId').val(rentalId);
+        loadRentalNotes(rentalId);
+        $('#addNoteModal').modal('show');
+    });
+
+    // Save note handler with retry logic
+    $('#saveNoteBtn').on('click', function() {
+        const rentalId = $('#addNoteRentalId').val();
+        const noteContent = $('#noteContent').val().trim();
+        
+        if (!noteContent) {
+            alert('Please enter a note');
+            return;
+        }
+
+        console.log('Saving note for rental:', rentalId);
+        
+        $('#saveNoteBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        
+        const saveNote = function(retryCount = 0) {
+            $.ajax({
+                url: `/api/rentals/${rentalId}/notes`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    noteContent: noteContent,
+                    author: 'User'
+                }),
+                success: function(response) {
+                    console.log('Note saved successfully:', response);
+                    $('#addNoteModal').modal('hide');
+                    $('#noteContent').val('');
+                    loadRentals();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to save note:', error);
+                    if (xhr.status === 409 && retryCount < 3) {
+                        console.log('Version conflict, retrying...');
+                        loadRentals().then(() => {
+                            setTimeout(() => saveNote(retryCount + 1), 1000);
+                        });
+                    } else {
+                        alert('Failed to save note: ' + (xhr.responseJSON?.message || 'Server error'));
+                    }
+                },
+                complete: function() {
+                    if (xhr.status !== 409 || retryCount >= 3) {
+                        $('#saveNoteBtn').prop('disabled', false).html('Save Note');
+                    }
+                }
+            });
+        };
+
+        saveNote();
     });
 
     // Add Document button
@@ -533,43 +585,6 @@ const Rentals = (function() {
         error: function(xhr) {
           console.error('Error uploading documents:', xhr.responseText);
           Main.showAlert('Failed to upload documents: ' + (xhr.responseJSON?.error || 'Server error'), 'danger');
-        }
-      });
-    });
-
-    // Add note functionality
-    $('#saveNoteBtn').on('click', function() {
-      const rentalId = $('#addNoteRentalId').val();
-      const noteContent = $('#noteContent').val().trim();
-      
-      if (!noteContent) {
-        Main.showAlert('Please enter a note', 'warning');
-        return;
-      }
-      
-      // Log what we're sending for debugging
-      console.log('Sending note data:', { noteContent, rentalId });
-      
-      $.ajax({
-        url: `/api/rentals/${rentalId}/notes`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          noteContent: noteContent,  // Changed from 'content' to 'noteContent'
-          content: noteContent       // Also send as 'content' as a fallback
-        }),
-        success: function(response) {
-          // Clear the input field
-          $('#noteContent').val('');
-          
-          // Update the existing notes display
-          loadRentalNotes(rentalId);
-          
-          Main.showAlert('Note added successfully', 'success');
-        },
-        error: function(xhr) {
-          console.error('Error adding note:', xhr.responseText);
-          Main.showAlert('Failed to add note: ' + (xhr.responseJSON?.message || 'Server error'), 'danger');
         }
       });
     });

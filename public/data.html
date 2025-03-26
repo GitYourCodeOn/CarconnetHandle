@@ -198,4 +198,70 @@
       </div>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Rental Logs</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="rentalLogsTable">
+                        <thead>
+                            <tr>
+                                <th>Car</th>
+                                <th>Customer</th>
+                                <th>Contact</th>
+                                <th>Start Date</th>
+                                <th>Return Date</th>
+                                <th>Fee</th>
+                                <th>Duration</th>
+                                <th>Time Remaining</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" class="text-center">Loading rentals...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Add this right after your existing table -->
+  <div class="modal fade" id="dataAddNoteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Note</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="dataAddNoteForm">
+                    <input type="hidden" id="dataAddNoteRentalId">
+                    <div class="form-group">
+                        <label for="dataNoteContent">Note</label>
+                        <textarea class="form-control" id="dataNoteContent" rows="3" required></textarea>
+                    </div>
+                    <div id="existingNotes" class="mt-4">
+                        <h6>Existing Notes</h6>
+                        <div class="existing-notes-list"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="dataSaveNoteBtn">Save Note</button>
+            </div>
+        </div>
+    </div>
+  </div>
 </div> 

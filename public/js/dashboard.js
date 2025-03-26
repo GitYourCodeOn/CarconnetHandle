@@ -1,104 +1,110 @@
 // Dashboard module
 const Dashboard = (function() {
-  // Load Dashboard (available cars and active rentals)
-  function loadDashboard() {
-    console.log('Loading dashboard...');
+  // Initialize dashboard
+  function init() {
+    console.log('Initializing dashboard...');
     
-    // Load all rentals to properly count active ones
-    $.get('/api/rentals', function(rentals) {
-      console.log('Rentals loaded:', rentals.length);
-      
-      const today = new Date();
-      
-      // Filter for active rentals - those that haven't been returned and are within their rental period
-      const activeRentals = rentals.filter(rental => {
-        const startDate = new Date(rental.startDate);
-        const endDate = new Date(rental.endDate);
-        
-        return !rental.returnDate && today >= startDate && today <= endDate;
-      });
-      
-      console.log('Active rentals count:', activeRentals.length);
-      $('#activeRentalsCount').text(activeRentals.length);
-      
-      // Load cars to show available ones
-      $.get('/api/cars', function(cars) {
-        console.log('Cars loaded:', cars.length);
-        
-        // Get IDs of cars that are in active rentals
-        const rentedCarIds = activeRentals.map(rental => {
-          return rental.car?._id || rental.carId;
-        });
-        
-        // Filter available cars (not in active rentals)
-        const availableCars = cars.filter(car => !rentedCarIds.includes(car._id));
-        
-        // Update dashboard counts
-        $('#totalFleet').text(cars.length);
-        $('#availableCarsCount').text(availableCars.length);
-        
-        // Update active rentals list (if it exists on the dashboard)
-        if ($('#activeRentalsList').length) {
-          updateActiveRentalsList(activeRentals);
-        }
-        
-        // Update available cars list (if it exists on the dashboard)
-        if ($('#availableCarsContent').length) {
-          updateAvailableCarsList(availableCars);
-        }
-      });
+    // Load dashboard data
+    loadDashboardData();
+    
+    // Set up event handlers
+    setupEventHandlers();
+    
+    // Listen for settings changes
+    $(document).on('settingsChanged', function() {
+      console.log('Dashboard detected settings change');
+      loadDashboardData();
     });
   }
-
-  // Load available cars (for Dashboard's available cars section)
-  function loadAvailableCars() {
-    // Get both cars and active rentals to cross-reference
-    $.when(
-      $.get('/api/cars'),
-      $.get('/api/rentals/active')
-    ).done(function(carsResponse, rentalsResponse) {
-      const cars = carsResponse[0];
-      const activeRentals = rentalsResponse[0];
-      
-      // Get IDs of cars that are currently rented
-      const rentedCarIds = activeRentals.map(rental => rental.car._id);
-      
-      // Filter out rented cars
-      const availableCars = cars.filter(car => !rentedCarIds.includes(car._id));
-      
-      let availableHtml = '<h4>Available Cars</h4>';
-      if (availableCars.length === 0) {
-        availableHtml += '<p>No cars available.</p>';
-      } else {
-        availableHtml += '<ul class="list-group">';
-        availableCars.forEach(function(car) {
-          availableHtml += `<li class="list-group-item">${car.make} ${car.model} (${car.year || ''})</li>`;
-        });
-        availableHtml += '</ul>';
-      }
-      $('#availableCarsContent').html(availableHtml);
-    }).fail(function() {
-      $('#availableCarsContent').html('<p class="text-danger">Failed to load available cars.</p>');
-    });
+  
+  // Load dashboard data
+  function loadDashboardData() {
+    // Get data from localStorage or API
+    const rentals = JSON.parse(localStorage.getItem('rentals') || '[]');
+    const cars = JSON.parse(localStorage.getItem('cars') || '[]');
+    const revenue = JSON.parse(localStorage.getItem('revenue') || '[]');
+    
+    // Update dashboard UI
+    updateDashboardStats(rentals, cars, revenue);
+    updateRecentRentals(rentals);
+    updateCarAvailability(cars);
   }
-
-  // Add refresh method to be called after adding a rental
-  function refreshDashboard() {
-    loadDashboard();
+  
+  // Update dashboard statistics
+  function updateDashboardStats(rentals, cars, revenue) {
+    // Calculate statistics
+    const activeRentals = rentals.filter(r => !r.returned);
+    const totalRevenue = revenue.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    
+    // Calculate monthly revenue
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const monthlyRevenue = revenue
+      .filter(item => {
+        const date = new Date(item.date);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      })
+      .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    
+    // Update the UI with statistics
+    $('#totalCars').text(cars.length);
+    $('#availableCars').text(cars.filter(c => !c.isRented).length);
+    $('#activeRentals').text(activeRentals.length);
+    
+    // Update revenue figures with data attributes for currency formatting
+    $('#totalRevenue')
+      .attr('data-value', totalRevenue)
+      .text(formatCurrency(totalRevenue));
+      
+    $('#monthlyRevenue')
+      .attr('data-value', monthlyRevenue)
+      .text(formatCurrency(monthlyRevenue));
   }
-
-  // Public interface
-  return {
-    init: function() {
-      loadDashboard();
-      setupEventHandlers();
-    },
-    refreshDashboard: function() {
-      loadDashboard();
-    },
-    loadSummaryStats: function() {
-      // If you have this function
-      loadSummaryStats();
+  
+  // Helper function to format currency using AppSettings if available
+  function formatCurrency(amount) {
+    if (typeof AppSettings !== 'undefined' && AppSettings.formatCurrency) {
+      return AppSettings.formatCurrency(amount);
+    } else {
+      // Fallback
+      const symbol = localStorage.getItem('appSettings') ? 
+        JSON.parse(localStorage.getItem('appSettings')).currency || 'K' : 'K';
+      return `${symbol} ${parseFloat(amount).toFixed(2)}`;
     }
+  }
+  
+  // Update recent rentals list
+  function updateRecentRentals(rentals) {
+    // ... existing code ...
+  }
+  
+  // Update car availability
+  function updateCarAvailability(cars) {
+    // ... existing code ...
+  }
+  
+  // Set up event handlers
+  function setupEventHandlers() {
+    // ... existing code ...
+  }
+  
+  // Return public API
+  return {
+    init: init
   };
-})(); 
+})();
+
+$(document).on('settingsChanged', function() {
+    console.log('Dashboard detected settings change');
+    updateDashboardStats();
+});
+
+function updateDashboardStats() {
+    // ...existing code...
+    
+    $('#totalRevenue').text(AppSettings.formatCurrency(totalRevenue));
+    $('#currentMonthRevenue').text(AppSettings.formatCurrency(monthlyRevenue));
+    // ...other currency displays...
+} 

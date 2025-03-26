@@ -1,186 +1,258 @@
-// Settings module
+/**
+ * Settings Module - Handles the settings UI and interactions
+ */
 const Settings = (function() {
-  // Load settings from local storage or defaults
-  function loadSettings() {
-    // Set default values
-    window.currencySymbol = localStorage.getItem('currencySymbol') || '£';
-    window.dateFormat = localStorage.getItem('dateFormat') || 'en-GB';
-    window.timeFormat = localStorage.getItem('timeFormat') || '24h';
-    window.language = localStorage.getItem('language') || 'en-GB';
-    window.reminderDays = parseInt(localStorage.getItem('reminderDays') || '7');
-    window.defaultRentalDuration = parseInt(localStorage.getItem('defaultRentalDuration') || '7');
-    window.darkMode = localStorage.getItem('darkMode') === 'true';
-    window.emailNotifications = localStorage.getItem('emailNotifications') === 'true';
-    
-    // Apply dark mode if enabled
-    if (window.darkMode) {
-      $('body').addClass('dark-mode');
-      $('#darkModeSetting').prop('checked', true);
-    } else {
-      $('body').removeClass('dark-mode');
-      $('#darkModeSetting').prop('checked', false);
+    // Set up event handlers for the settings form
+    function setupEventHandlers() {
+        console.log('Setting up settings event handlers');
+        
+        // Load current settings into form fields
+        loadSettingsIntoForm();
+        
+        // Set up tab navigation
+        $('.settings-nav a').on('click', function(e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+        
+        // Handle general settings form submission
+        $('#settingsForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form values
+            const newSettings = {
+                companyName: $('#companyName').val(),
+                currency: $('#currency').val(),
+                currencyName: $('#currency option:selected').text(),
+                dateFormat: $('#dateFormat').val(),
+                defaultPage: $('#defaultPage').val()
+            };
+            
+            // Save settings
+            if (AppSettings.saveSettings(newSettings)) {
+                showAlert('Settings saved successfully!', 'success');
+                
+                // Force update all currency displays
+                setTimeout(function() {
+                    AppSettings.updateCurrencyDisplays();
+                }, 100);
+            } else {
+                showAlert('Failed to save settings. Please try again.', 'danger');
+            }
+        });
+        
+        // Handle notifications form submission
+        $('#notificationsForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const notificationSettings = {
+                emailNotifications: $('#emailNotifications').prop('checked'),
+                smsNotifications: $('#smsNotifications').prop('checked'),
+                browserNotifications: $('#browserNotifications').prop('checked')
+            };
+            
+            if (AppSettings.saveSettings(notificationSettings)) {
+                showAlert('Notification settings saved successfully!', 'success', '#notifications-section');
+            } else {
+                showAlert('Failed to save notification settings.', 'danger', '#notifications-section');
+            }
+        });
+        
+        // Handle reminder settings form submission
+        $('#reminderSettingsForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const reminderSettings = {
+                reminderDays: parseInt($('#reminderDays').val()),
+                rentalDueReminders: $('#rentalDueReminders').prop('checked'),
+                serviceReminders: $('#serviceReminders').prop('checked'),
+                insuranceReminders: $('#insuranceReminders').prop('checked')
+            };
+            
+            if (AppSettings.saveSettings(reminderSettings)) {
+                showAlert('Reminder settings saved successfully!', 'success', '#reminder-section');
+            } else {
+                showAlert('Failed to save reminder settings.', 'danger', '#reminder-section');
+            }
+        });
+        
+        // Handle backup button
+        $('#backupDataBtn').on('click', function() {
+            backupData();
+        });
+        
+        // Handle restore button
+        $('#restoreDataBtn').on('click', function() {
+            restoreData();
+        });
+        
+        // Handle reset button
+        $('#resetSettings').on('click', function(e) {
+            e.preventDefault();
+            
+            if (confirm('Are you sure you want to reset all settings to default?')) {
+                if (AppSettings.resetSettings()) {
+                    loadSettingsIntoForm();
+                    showAlert('Settings have been reset to default values', 'info');
+                } else {
+                    showAlert('Failed to reset settings', 'danger');
+                }
+            }
+        });
     }
     
-    // Set currency symbol in relevant places
-    $('.currency-symbol').text(window.currencySymbol);
+    // Load current settings into the form
+    function loadSettingsIntoForm() {
+        const settings = AppSettings.getSettings();
+        
+        // General settings
+        $('#companyName').val(settings.companyName || '');
+        $('#currency').val(settings.currency || 'K');
+        $('#dateFormat').val(settings.dateFormat || 'DD/MM/YYYY');
+        $('#defaultPage').val(settings.defaultPage || 'dashboard');
+        
+        // Notification settings
+        $('#emailNotifications').prop('checked', settings.emailNotifications || false);
+        $('#smsNotifications').prop('checked', settings.smsNotifications || false);
+        $('#browserNotifications').prop('checked', settings.browserNotifications || false);
+        
+        // Reminder settings
+        $('#reminderDays').val(settings.reminderDays || 7);
+        $('#rentalDueReminders').prop('checked', settings.rentalDueReminders !== false);
+        $('#serviceReminders').prop('checked', settings.serviceReminders !== false);
+        $('#insuranceReminders').prop('checked', settings.insuranceReminders !== false);
+        
+        console.log('Settings loaded into form:', settings);
+    }
     
-    // Set form values
-    $('#currencySetting').val(window.currencySymbol);
-    $('#dateFormatSetting').val(window.dateFormat);
-    $('#timeFormatSetting').val(window.timeFormat);
-    $('#languageSetting').val(window.language);
-    $('#reminderDaysSetting').val(window.reminderDays);
-    $('#defaultRentalDurationSetting').val(window.defaultRentalDuration);
-    $('#emailNotificationsSetting').prop('checked', window.emailNotifications);
-    
-    // Load company info if available
-    const companyInfo = JSON.parse(localStorage.getItem('companyInfo') || '{}');
-    $('#companyNameSetting').val(companyInfo.name || '');
-    $('#companyPhoneSetting').val(companyInfo.phone || '');
-    $('#companyEmailSetting').val(companyInfo.email || '');
-    $('#companyWebsiteSetting').val(companyInfo.website || '');
-    $('#companyAddressSetting').val(companyInfo.address || '');
-  }
-  
-  // Set up event handlers for settings
-  function setupEventHandlers() {
-    // Save global settings
-    $('#globalSettingsForm').submit(function(e) {
-      e.preventDefault();
-      
-      // Get values from form
-      const currencySymbol = $('#currencySetting').val();
-      const dateFormat = $('#dateFormatSetting').val();
-      const timeFormat = $('#timeFormatSetting').val();
-      const language = $('#languageSetting').val();
-      const reminderDays = $('#reminderDaysSetting').val();
-      const defaultRentalDuration = $('#defaultRentalDurationSetting').val();
-      const darkMode = $('#darkModeSetting').prop('checked');
-      const emailNotifications = $('#emailNotificationsSetting').prop('checked');
-      
-      // Save to local storage
-      localStorage.setItem('currencySymbol', currencySymbol);
-      localStorage.setItem('dateFormat', dateFormat);
-      localStorage.setItem('timeFormat', timeFormat);
-      localStorage.setItem('language', language);
-      localStorage.setItem('reminderDays', reminderDays);
-      localStorage.setItem('defaultRentalDuration', defaultRentalDuration);
-      localStorage.setItem('darkMode', darkMode);
-      localStorage.setItem('emailNotifications', emailNotifications);
-      
-      // Apply dark mode immediately
-      if (darkMode) {
-        $('body').addClass('dark-mode');
-      } else {
-        $('body').removeClass('dark-mode');
-      }
-      
-      // Update global variables
-      window.currencySymbol = currencySymbol;
-      window.dateFormat = dateFormat;
-      window.timeFormat = timeFormat;
-      window.language = language;
-      window.reminderDays = parseInt(reminderDays);
-      window.defaultRentalDuration = parseInt(defaultRentalDuration);
-      window.darkMode = darkMode;
-      window.emailNotifications = emailNotifications;
-      
-      // Update currency symbol in UI
-      $('.currency-symbol').text(currencySymbol);
-      
-      showAlert('Settings saved successfully', 'success');
-    });
-    
-    // Save company info
-    $('#companyInfoForm').submit(function(e) {
-      e.preventDefault();
-      
-      // Get values from form
-      const companyInfo = {
-        name: $('#companyNameSetting').val(),
-        phone: $('#companyPhoneSetting').val(),
-        email: $('#companyEmailSetting').val(),
-        website: $('#companyWebsiteSetting').val(),
-        address: $('#companyAddressSetting').val()
-      };
-      
-      // Save to local storage
-      localStorage.setItem('companyInfo', JSON.stringify(companyInfo));
-      
-      showAlert('Company information saved', 'success');
-    });
-    
-    // Backup data
-    $('#backupDataBtn').click(function() {
-      // Collect all data from localStorage
-      const backupData = {
-        settings: {
-          currencySymbol: localStorage.getItem('currencySymbol'),
-          dateFormat: localStorage.getItem('dateFormat'),
-          timeFormat: localStorage.getItem('timeFormat'),
-          language: localStorage.getItem('language'),
-          reminderDays: localStorage.getItem('reminderDays'),
-          defaultRentalDuration: localStorage.getItem('defaultRentalDuration'),
-          darkMode: localStorage.getItem('darkMode'),
-          emailNotifications: localStorage.getItem('emailNotifications')
-        },
-        companyInfo: JSON.parse(localStorage.getItem('companyInfo') || '{}')
-      };
-      
-      // Convert to JSON and create download link
-      const backupJson = JSON.stringify(backupData, null, 2);
-      const blob = new Blob([backupJson], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `carconnect_backup_${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      
-      showAlert('Backup created successfully', 'success');
-    });
-    
-    // Restore data
-    $('#restoreDataBtn').click(function() {
-      const file = $('#restoreFileSetting')[0].files[0];
-      if (!file) {
-        showAlert('Please select a backup file first', 'warning');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
+    // Create and download a backup file
+    function backupData() {
         try {
-          const backupData = JSON.parse(e.target.result);
-          
-          // Restore settings
-          if (backupData.settings) {
-            for (const key in backupData.settings) {
-              if (backupData.settings[key] !== null) {
-                localStorage.setItem(key, backupData.settings[key]);
-              }
-            }
-          }
-          
-          // Restore company info
-          if (backupData.companyInfo) {
-            localStorage.setItem('companyInfo', JSON.stringify(backupData.companyInfo));
-          }
-          
-          // Reload settings
-          loadSettings();
-          
-          showAlert('Data restored successfully', 'success');
+            // Get all data from localStorage
+            const backupData = {
+                timestamp: new Date().toISOString(),
+                settings: AppSettings.getSettings(),
+                rentals: JSON.parse(localStorage.getItem('rentals') || '[]'),
+                cars: JSON.parse(localStorage.getItem('cars') || '[]'),
+                customers: JSON.parse(localStorage.getItem('customers') || '[]'),
+                revenue: JSON.parse(localStorage.getItem('revenue') || '[]'),
+                expenses: JSON.parse(localStorage.getItem('expenses') || '[]'),
+                reminders: JSON.parse(localStorage.getItem('reminders') || '[]')
+            };
+            
+            // Convert to JSON string
+            const dataStr = JSON.stringify(backupData, null, 2);
+            
+            // Create a download link
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const fileName = `carconnect_backup_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Backup created successfully!', 'success', '#backup-section');
         } catch (error) {
-          console.error('Error restoring data:', error);
-          showAlert('Error restoring data: ' + error.message, 'danger');
+            console.error('Error creating backup:', error);
+            showAlert('Failed to create backup: ' + error.message, 'danger', '#backup-section');
         }
-      };
-      reader.readAsText(file);
-    });
-  }
-  
-  return {
-    loadSettings: loadSettings,
-    setupEventHandlers: setupEventHandlers
-  };
-})(); 
+    }
+    
+    // Restore data from a backup file
+    function restoreData() {
+        const fileInput = document.getElementById('restoreFile');
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showAlert('Please select a backup file first', 'warning', '#backup-section');
+            return;
+        }
+        
+        const file = fileInput.files[0];
+        if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+            showAlert('Invalid file type. Please select a JSON backup file', 'danger', '#backup-section');
+            return;
+        }
+        
+        if (!confirm('Warning: This will overwrite your current data. Are you sure you want to proceed?')) {
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const backupData = JSON.parse(e.target.result);
+                
+                // Validate backup data structure
+                if (!backupData.settings || !backupData.timestamp) {
+                    throw new Error('Invalid backup file format');
+                }
+                
+                // Restore settings
+                AppSettings.saveSettings(backupData.settings);
+                
+                // Restore other data
+                if (backupData.rentals) localStorage.setItem('rentals', JSON.stringify(backupData.rentals));
+                if (backupData.cars) localStorage.setItem('cars', JSON.stringify(backupData.cars));
+                if (backupData.customers) localStorage.setItem('customers', JSON.stringify(backupData.customers));
+                if (backupData.revenue) localStorage.setItem('revenue', JSON.stringify(backupData.revenue));
+                if (backupData.expenses) localStorage.setItem('expenses', JSON.stringify(backupData.expenses));
+                if (backupData.reminders) localStorage.setItem('reminders', JSON.stringify(backupData.reminders));
+                
+                showAlert('Data restored successfully! Reloading page...', 'success', '#backup-section');
+                
+                // Reload page after a delay to apply all restored settings
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error restoring data:', error);
+                showAlert('Failed to restore data: ' + error.message, 'danger', '#backup-section');
+            }
+        };
+        
+        reader.readAsText(file);
+    }
+    
+    // Show alert message in a specific container
+    function showAlert(message, type = 'info', container = '#settingsAlerts') {
+        const alert = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `;
+        
+        $(container).html(alert);
+        
+        // Auto dismiss after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    }
+    
+    // Initialize settings
+    function init() {
+        setupEventHandlers();
+        
+        // Do a manual currency update when first loading settings
+        setTimeout(function() {
+            AppSettings.updateCurrencyDisplays();
+        }, 500);
+    }
+    
+    // Return public API
+    return {
+        init: init
+    };
+})();
+
+// Initialize settings when document is ready
+$(document).ready(function() {
+    Settings.init();
+}); 

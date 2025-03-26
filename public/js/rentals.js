@@ -105,7 +105,7 @@ const Rentals = (function() {
       
       // Format fee
       const rentalFee = rental.rentalFee || rental.dailyRate || 0;
-      const formattedFee = !isNaN(rentalFee) ? `ZMW ${parseFloat(rentalFee).toFixed(2)}` : 'ZMW -';
+      const formattedFee = !isNaN(rentalFee) ? formatCurrency(rentalFee) : `${SettingsManager.getSetting('currency')}-`;
       
       // Handle documents/notes
       const hasDocuments = rental.documents && rental.documents.length > 0;
@@ -807,6 +807,10 @@ const Rentals = (function() {
     }
     
     console.log(`Filtered rentals: ${filteredCount} of ${rows.length} shown`);
+  }
+
+  function formatCurrency(amount) {
+    return `${SettingsManager.getSetting('currency')}${parseFloat(amount).toFixed(2)}`;
   }
 
   // Return public methods

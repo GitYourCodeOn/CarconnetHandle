@@ -281,6 +281,9 @@
   <script src="js/finances.js"></script>
   <script src="js/settings.js"></script>
   
+  <!-- Before any other application scripts -->
+  <script src="js/app-settings.js"></script>
+  
   <script>
     // Initialize application
     $(document).ready(function() {
@@ -303,15 +306,8 @@
         Reminders.init();
       });
       
-      // Load modals first
-      $('#modalsContainer').load('modals.html', function() {
-        console.log('Modals loaded');
-        
-        // Then load data tab
-        $('#data').load('data.html', function() {
-          console.log('Data tab loaded');
-          Data.initializeData();
-        });
+      $('#data').load('data.html', function() {
+        Data.initializeData();
       });
       
       $('#marketing').load('marketing.html', function() {
@@ -325,6 +321,9 @@
       $('#settings').load('settings.html', function() {
         Settings.init();
       });
+      
+      // Load modals
+      $('#modalsContainer').load('modals.html');
       
       // Handle desktop tab clicks to refresh data
       $('#mainTabs a').on('click', function(e) {

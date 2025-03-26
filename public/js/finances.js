@@ -9,6 +9,20 @@ const Finances = (function() {
         
         // Set up event listeners
         setupFinancesEventListeners();
+        
+        // Listen for settings changes
+        $(document).on('settingsChanged', function() {
+            console.log('Finance module detected settings change');
+            loadFinancialData();
+        });
+    }
+    
+    // Refresh currency displays when settings change
+    function refreshCurrencyDisplays() {
+        updateFinancialOverview(
+            JSON.parse(localStorage.getItem('revenue') || '[]'),
+            JSON.parse(localStorage.getItem('expenses') || '[]')
+        );
     }
     
     // Load financial data
@@ -31,9 +45,10 @@ const Finances = (function() {
         const netProfit = totalRevenue - totalExpenses;
         const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100).toFixed(1) : 0;
         
-        $('#totalRevenueValue').text(`£${totalRevenue.toFixed(2)}`);
-        $('#totalExpensesValue').text(`£${totalExpenses.toFixed(2)}`);
-        $('#netProfitValue').text(`£${netProfit.toFixed(2)}`);
+        // Store raw values as data attributes for easy updating
+        $('#totalRevenueValue').data('value', totalRevenue).text(AppSettings.formatCurrency(totalRevenue));
+        $('#totalExpensesValue').data('value', totalExpenses).text(AppSettings.formatCurrency(totalExpenses));
+        $('#netProfitValue').data('value', netProfit).text(AppSettings.formatCurrency(netProfit));
         $('#profitMarginValue').text(`${profitMargin}%`);
     }
     
@@ -65,7 +80,9 @@ const Finances = (function() {
                     <td>${formatDate(entry.date)}</td>
                     <td>${entry.description}</td>
                     <td>${entry.category}</td>
-                    <td>£${parseFloat(entry.amount).toFixed(2)}</td>
+                    <td class="currency-display" data-value="${parseFloat(entry.amount).toFixed(2)}">
+                        ${AppSettings.formatCurrency(entry.amount)}
+                    </td>
                     <td>
                         <div class="btn-group btn-group-sm">
                             <button class="btn btn-primary edit-revenue" data-id="${entry.id}" title="Edit">
@@ -83,7 +100,7 @@ const Finances = (function() {
         });
         
         // Update total
-        $('#revenueTotalValue').text(`£${totalAmount.toFixed(2)}`);
+        $('#revenueTotalValue').text(`${AppSettings.formatCurrency(totalAmount)}`);
     }
     
     // Update expenses table
@@ -114,7 +131,9 @@ const Finances = (function() {
                     <td>${formatDate(entry.date)}</td>
                     <td>${entry.description}</td>
                     <td>${entry.category}</td>
-                    <td>£${parseFloat(entry.amount).toFixed(2)}</td>
+                    <td class="currency-display" data-value="${parseFloat(entry.amount).toFixed(2)}">
+                        ${AppSettings.formatCurrency(entry.amount)}
+                    </td>
                     <td>
                         <div class="btn-group btn-group-sm">
                             <button class="btn btn-primary edit-expense" data-id="${entry.id}" title="Edit">
@@ -132,7 +151,7 @@ const Finances = (function() {
         });
         
         // Update total
-        $('#expenseTotalValue').text(`£${totalAmount.toFixed(2)}`);
+        $('#expenseTotalValue').text(`${AppSettings.formatCurrency(totalAmount)}`);
     }
     
     // Update charts

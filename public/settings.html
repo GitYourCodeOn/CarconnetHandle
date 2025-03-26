@@ -8,36 +8,30 @@
   </div>
 
   <div class="row">
-    <div class="col-lg-3">
-      <div class="nav flex-column nav-pills settings-nav" id="settings-tab" role="tablist">
-        <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab">
-          <i class="fas fa-cog mr-2"></i>General Settings
-        </a>
-        <a class="nav-link" id="notification-tab" data-toggle="pill" href="#notification" role="tab">
-          <i class="fas fa-bell mr-2"></i>Notifications
-        </a>
-        <a class="nav-link" id="reminder-tab" data-toggle="pill" href="#reminder" role="tab">
-          <i class="fas fa-calendar-check mr-2"></i>Reminder Settings
-        </a>
-        <a class="nav-link" id="backup-tab" data-toggle="pill" href="#backup" role="tab">
-          <i class="fas fa-database mr-2"></i>Backup & Restore
-        </a>
-        <a class="nav-link" id="about-tab" data-toggle="pill" href="#about" role="tab">
-          <i class="fas fa-info-circle mr-2"></i>About System
-        </a>
+    <div class="col-md-3">
+      <div class="list-group settings-nav">
+        <a href="#general-section" class="list-group-item list-group-item-action active" data-toggle="tab">General Settings</a>
+        <a href="#notifications-section" class="list-group-item list-group-item-action" data-toggle="tab">Notifications</a>
+        <a href="#reminder-section" class="list-group-item list-group-item-action" data-toggle="tab">Reminder Settings</a>
+        <a href="#backup-section" class="list-group-item list-group-item-action" data-toggle="tab">Backup & Restore</a>
+        <a href="#about-section" class="list-group-item list-group-item-action" data-toggle="tab">About System</a>
       </div>
     </div>
     
-    <div class="col-lg-9">
-      <div class="tab-content settings-content" id="settings-tabContent">
+    <div class="col-md-9">
+      <div class="tab-content">
         <!-- General Settings -->
-        <div class="tab-pane fade show active" id="general" role="tabpanel">
+        <div class="tab-pane fade show active" id="general-section">
           <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-cog mr-2"></i>General Settings</h5>
+            <div class="card-header bg-primary text-white">
+              <h5>General Settings</h5>
             </div>
             <div class="card-body">
-              <form id="generalSettingsForm">
+              <div id="settingsAlerts">
+                <!-- Alert messages will be displayed here -->
+              </div>
+              
+              <form id="settingsForm">
                 <div class="form-group">
                   <label for="companyName">Company Name</label>
                   <input type="text" class="form-control" id="companyName" name="companyName">
@@ -46,10 +40,10 @@
                 <div class="form-group">
                   <label for="currency">Currency</label>
                   <select class="form-control" id="currency" name="currency">
+                    <option value="K">Zambian Kwacha (K)</option>
                     <option value="£">British Pound (£)</option>
                     <option value="$">US Dollar ($)</option>
                     <option value="€">Euro (€)</option>
-                    <option value="K">Zambian Kwacha (K)</option>
                   </select>
                 </div>
                 
@@ -63,193 +57,175 @@
                 </div>
                 
                 <div class="form-group">
-                  <label>Default Page</label>
+                  <label for="defaultPage">Default Page</label>
                   <select class="form-control" id="defaultPage" name="defaultPage">
                     <option value="dashboard">Dashboard</option>
-                    <option value="cars">Cars</option>
                     <option value="rentals">Rentals</option>
-                    <option value="reminders">Reminders</option>
+                    <option value="cars">Cars</option>
+                    <option value="finances">Finances</option>
+                    <option value="data">Rental Logs</option>
                   </select>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="form-group mt-4">
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                  <button type="button" id="resetSettings" class="btn btn-outline-danger ml-2">Reset to Default</button>
+                </div>
               </form>
             </div>
           </div>
         </div>
         
-        <!-- Notification Settings -->
-        <div class="tab-pane fade" id="notification" role="tabpanel">
+        <!-- Notifications Tab -->
+        <div class="tab-pane fade" id="notifications-section">
           <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-bell mr-2"></i>Notification Settings</h5>
+            <div class="card-header bg-primary text-white">
+              <h5>Notification Settings</h5>
             </div>
             <div class="card-body">
-              <form id="notificationSettingsForm">
+              <form id="notificationsForm">
                 <div class="form-group">
                   <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="enableEmailNotifications" name="enableEmailNotifications">
-                    <label class="custom-control-label" for="enableEmailNotifications">Enable Email Notifications</label>
+                    <input type="checkbox" class="custom-control-input" id="emailNotifications" name="emailNotifications">
+                    <label class="custom-control-label" for="emailNotifications">Email Notifications</label>
                   </div>
-                </div>
-                
-                <div class="form-group">
-                  <label for="emailAddress">Email Address for Notifications</label>
-                  <input type="email" class="form-control" id="emailAddress" name="emailAddress">
+                  <small class="form-text text-muted">Receive email notifications for important events</small>
                 </div>
                 
                 <div class="form-group">
                   <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="reminderNotifications" name="reminderNotifications">
-                    <label class="custom-control-label" for="reminderNotifications">Reminder Notifications</label>
+                    <input type="checkbox" class="custom-control-input" id="smsNotifications" name="smsNotifications">
+                    <label class="custom-control-label" for="smsNotifications">SMS Notifications</label>
                   </div>
+                  <small class="form-text text-muted">Receive SMS notifications for important events</small>
                 </div>
                 
                 <div class="form-group">
                   <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="rentalDueNotifications" name="rentalDueNotifications">
-                    <label class="custom-control-label" for="rentalDueNotifications">Rental Due Notifications</label>
+                    <input type="checkbox" class="custom-control-input" id="browserNotifications" name="browserNotifications">
+                    <label class="custom-control-label" for="browserNotifications">Browser Notifications</label>
                   </div>
+                  <small class="form-text text-muted">Receive browser notifications when using the app</small>
                 </div>
                 
-                <div class="form-group">
-                  <label for="reminderDays">Send Reminders (days before due date)</label>
-                  <input type="number" class="form-control" id="reminderDays" name="reminderDays" min="1" max="30">
+                <div class="form-group mt-4">
+                  <button type="submit" class="btn btn-primary">Save Notification Settings</button>
                 </div>
-                
-                <button type="submit" class="btn btn-primary">Save Notification Settings</button>
               </form>
             </div>
           </div>
         </div>
         
-        <!-- Reminder Settings -->
-        <div class="tab-pane fade" id="reminder" role="tabpanel">
+        <!-- Reminder Settings Tab -->
+        <div class="tab-pane fade" id="reminder-section">
           <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-calendar-check mr-2"></i>Reminder Settings</h5>
+            <div class="card-header bg-primary text-white">
+              <h5>Reminder Settings</h5>
             </div>
             <div class="card-body">
               <form id="reminderSettingsForm">
                 <div class="form-group">
-                  <label>Set Default Reminder Categories</label>
-                  <div id="reminderCategories">
-                    <div class="input-group mb-2">
-                      <input type="text" class="form-control" name="reminderCategory[]" value="Service" readonly>
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" disabled>System</button>
-                      </div>
-                    </div>
-                    <div class="input-group mb-2">
-                      <input type="text" class="form-control" name="reminderCategory[]" value="Insurance" readonly>
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" disabled>System</button>
-                      </div>
-                    </div>
-                    <div class="input-group mb-2">
-                      <input type="text" class="form-control" name="reminderCategory[]" value="Tax" readonly>
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" disabled>System</button>
-                      </div>
-                    </div>
-                    <div class="input-group mb-2">
-                      <input type="text" class="form-control" name="reminderCategory[]" placeholder="Custom reminder category">
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-danger remove-category" type="button">Remove</button>
-                      </div>
-                    </div>
-                  </div>
-                  <button type="button" id="addReminderCategory" class="btn btn-sm btn-outline-primary mt-2">
-                    <i class="fas fa-plus-circle mr-1"></i>Add Category
-                  </button>
+                  <label for="reminderDays">Default Reminder Days</label>
+                  <select class="form-control" id="reminderDays" name="reminderDays">
+                    <option value="1">1 day before</option>
+                    <option value="3">3 days before</option>
+                    <option value="7">7 days before</option>
+                    <option value="14">14 days before</option>
+                    <option value="30">30 days before</option>
+                  </select>
+                  <small class="form-text text-muted">How many days before an event to send reminders</small>
                 </div>
                 
                 <div class="form-group">
-                  <label for="defaultReminderPriority">Default Reminder Priority</label>
-                  <select class="form-control" id="defaultReminderPriority" name="defaultReminderPriority">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
+                  <label>Reminder Types</label>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="rentalDueReminders" name="rentalDueReminders" checked>
+                    <label class="custom-control-label" for="rentalDueReminders">Rental Due Reminders</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="serviceReminders" name="serviceReminders" checked>
+                    <label class="custom-control-label" for="serviceReminders">Service Reminders</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="insuranceReminders" name="insuranceReminders" checked>
+                    <label class="custom-control-label" for="insuranceReminders">Insurance Reminders</label>
+                  </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Save Reminder Settings</button>
+                <div class="form-group mt-4">
+                  <button type="submit" class="btn btn-primary">Save Reminder Settings</button>
+                </div>
               </form>
             </div>
           </div>
         </div>
         
-        <!-- Backup & Restore -->
-        <div class="tab-pane fade" id="backup" role="tabpanel">
+        <!-- Backup and Restore Tab -->
+        <div class="tab-pane fade" id="backup-section">
           <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-database mr-2"></i>Backup & Restore</h5>
+            <div class="card-header bg-primary text-white">
+              <h5>Backup & Restore</h5>
             </div>
             <div class="card-body">
               <div class="alert alert-info">
-                <i class="fas fa-info-circle mr-2"></i>Backup your data regularly to prevent loss of important information.
+                <i class="fas fa-info-circle mr-2"></i> Backup your data regularly to prevent data loss
               </div>
               
-              <div class="backup-section mb-4">
-                <h6>Create Backup</h6>
-                <p>Create a backup of all your car rental system data. The backup includes cars, rentals, reminders, and settings.</p>
-                <button id="createBackup" class="btn btn-primary">
-                  <i class="fas fa-download mr-2"></i>Create Backup
+              <div class="form-group">
+                <button id="backupDataBtn" class="btn btn-primary">
+                  <i class="fas fa-download mr-1"></i> Backup Data
                 </button>
+                <small class="form-text text-muted">Creates a backup file of all your data</small>
               </div>
               
-              <div class="restore-section">
-                <h6>Restore Data</h6>
-                <p>Restore your data from a previous backup file. This will replace your current data.</p>
-                <form id="restoreForm">
-                  <div class="custom-file mb-3">
-                    <input type="file" class="custom-file-input" id="backupFile" accept=".json">
-                    <label class="custom-file-label" for="backupFile">Choose backup file...</label>
-                  </div>
-                  <button type="submit" class="btn btn-warning">
-                    <i class="fas fa-upload mr-2"></i>Restore Data
-                  </button>
-                </form>
-              </div>
-              
-              <div class="export-section mt-4">
-                <h6>Export Data</h6>
-                <p>Export specific data for analysis or reporting purposes.</p>
-                <div class="btn-group" role="group">
-                  <button id="exportCars" class="btn btn-outline-primary">Export Cars</button>
-                  <button id="exportRentals" class="btn btn-outline-primary">Export Rentals</button>
-                  <button id="exportReminders" class="btn btn-outline-primary">Export Reminders</button>
+              <div class="form-group mt-4">
+                <label for="restoreFile">Restore Data</label>
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="restoreFile">
+                  <label class="custom-file-label" for="restoreFile">Choose backup file...</label>
                 </div>
+                <button id="restoreDataBtn" class="btn btn-warning mt-2">
+                  <i class="fas fa-upload mr-1"></i> Restore from Backup
+                </button>
+                <small class="form-text text-muted">Warning: This will overwrite current data</small>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- About System -->
-        <div class="tab-pane fade" id="about" role="tabpanel">
+        <!-- About System Tab -->
+        <div class="tab-pane fade" id="about-section">
           <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-info-circle mr-2"></i>About System</h5>
+            <div class="card-header bg-primary text-white">
+              <h5>About System</h5>
             </div>
             <div class="card-body">
-              <h5>Car Connect Lusaka Rental Management System</h5>
-              <p class="text-muted">Version 1.0</p>
+              <h4 class="company-name">Car Connect Lusaka</h4>
+              <p class="lead">Car Rental Management System</p>
               
-              <p>This car rental management system was developed to help rental businesses efficiently manage their fleet, track rentals, and handle important reminders.</p>
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Version Information</h5>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Version
+                      <span class="badge badge-primary badge-pill">1.0.0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Last Updated
+                      <span>July 5, 2023</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
               
-              <h6 class="mt-4">Features:</h6>
-              <ul>
-                <li>Car inventory management</li>
-                <li>Rental tracking and management</li>
-                <li>Automated reminders for important dates</li>
-                <li>Document management for vehicles and rentals</li>
-                <li>Data backup and export capabilities</li>
-                <li>Mobile-friendly design</li>
-              </ul>
-              
-              <div class="mt-4">
-                <p>For support or inquiries, please contact:</p>
-                <p><a href="mailto:support@carconnect.com"><i class="fas fa-envelope mr-2"></i>support@carconnect.com</a></p>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Support</h5>
+                  <p>For technical support or feature requests, please contact:</p>
+                  <p><strong>Email:</strong> support@carconnect.com</p>
+                  <p><strong>Phone:</strong> +260 97 123 4567</p>
+                </div>
               </div>
             </div>
           </div>

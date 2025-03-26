@@ -536,57 +536,62 @@ const Rentals = (function() {
         saveNote();
     });
 
-    // Add Document button
-    $(document).on('click', '.add-document-btn', function() {
-      const rentalId = $(this).data('id');
-      $('#addDocumentsRentalId').val(rentalId);
-      
-      // Load existing documents for this rental
-      $.get(`/api/rentals/${rentalId}/documents`, function(documents) {
-        const docList = $('#existingDocumentsList');
-        docList.empty();
-        
-        if (documents && documents.length > 0) {
-          documents.forEach(doc => {
-            docList.append(`
-              <div class="existing-document">
-                <a href="${doc.url}" target="_blank">${doc.name}</a>
-                <small class="text-muted">(${new Date(doc.uploadDate).toLocaleString()})</small>
-              </div>
-            `);
-          });
-        } else {
-          docList.html('<p class="text-muted">No documents attached yet</p>');
-        }
-      });
-      
-      $('#addDocumentsModal').modal('show');
+    // Document button click handler
+    $('#allRentalsTable').on('click', '.add-document-btn', function() {
+        const rentalId = $(this).data('id');
+        console.log('Document button clicked for rental:', rentalId);
+        $('#addDocumentsRentalId').val(rentalId);
+        loadRentalDocuments(rentalId);
+        $('#addDocumentsModal').modal('show');
     });
 
-    // Handle document form submission with AJAX
-    $('#addDocumentsForm').submit(function(e) {
-      e.preventDefault();
-      
-      const rentalId = $('#addDocumentsRentalId').val();
-      const formData = new FormData(this);
-      
-      $.ajax({
-        url: `/api/rentals/${rentalId}/documents`,
-        type: 'POST',
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function(response) {
-          $('#addDocumentsModal').modal('hide');
-          Main.showAlert('Documents added successfully', 'success');
-          // Refresh the rentals list to show updated document count
-          Rentals.loadRentals();
-        },
-        error: function(xhr) {
-          console.error('Error uploading documents:', xhr.responseText);
-          Main.showAlert('Failed to upload documents: ' + (xhr.responseJSON?.error || 'Server error'), 'danger');
+    // Save document handler with retry logic
+    $('#saveDocumentsBtn').on('click', function() {
+        const rentalId = $('#addDocumentsRentalId').val();
+        const formData = new FormData($('#addDocumentsForm')[0]);
+        
+        if (!formData.get('documents') || formData.get('documents').size === 0) {
+            alert('Please select at least one document');
+            return;
         }
-      });
+
+        console.log('Uploading documents for rental:', rentalId);
+        
+        $('#saveDocumentsBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+        
+        const saveDocuments = function(retryCount = 0) {
+            $.ajax({
+                url: `/api/rentals/${rentalId}/documents`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    console.log('Documents uploaded successfully:', response);
+                    $('#addDocumentsModal').modal('hide');
+                    $('#addDocumentsForm')[0].reset();
+                    loadRentals();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to upload documents:', error);
+                    if (xhr.status === 409 && retryCount < 3) {
+                        console.log('Version conflict, retrying...');
+                        loadRentals().then(() => {
+                            setTimeout(() => saveDocuments(retryCount + 1), 1000);
+                        });
+                    } else {
+                        alert('Failed to upload documents: ' + (xhr.responseJSON?.message || 'Server error'));
+                    }
+                },
+                complete: function() {
+                    if (xhr.status !== 409 || retryCount >= 3) {
+                        $('#saveDocumentsBtn').prop('disabled', false).html('Upload Documents');
+                    }
+                }
+            });
+        };
+
+        saveDocuments();
     });
 
     // Function to load notes for a rental

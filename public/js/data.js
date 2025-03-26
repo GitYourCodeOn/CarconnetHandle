@@ -517,6 +517,86 @@ const Data = (function() {
         $('.modal-backdrop').remove();
         $('body').removeClass('modal-open');
     });
+
+    // Document button click handler
+    $('#rentalLogsTable').on('click', '.add-document-btn', function() {
+        const rentalId = $(this).data('id');
+        console.log('Document button clicked for rental:', rentalId);
+        $('#dataAddDocumentsRentalId').val(rentalId);
+        loadRentalDocuments(rentalId);
+        $('#dataAddDocumentsModal').modal('show');
+    });
+
+    // Save document handler with retry logic
+    $('#dataSaveDocumentsBtn').on('click', function() {
+        const rentalId = $('#dataAddDocumentsRentalId').val();
+        const formData = new FormData($('#dataAddDocumentsForm')[0]);
+        
+        if (!formData.get('documents') || formData.get('documents').size === 0) {
+            alert('Please select at least one document');
+            return;
+        }
+
+        console.log('Uploading documents for rental:', rentalId);
+        
+        // Add loading state
+        $('#dataSaveDocumentsBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+        
+        const saveDocuments = function(retryCount = 0) {
+            $.ajax({
+                url: `/api/rentals/${rentalId}/documents`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    console.log('Documents uploaded successfully:', response);
+                    $('#dataAddDocumentsModal').modal('hide');
+                    $('#dataAddDocumentsForm')[0].reset();
+                    loadRentalLogs();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to upload documents:', error);
+                    if (xhr.status === 409 && retryCount < 3) {
+                        console.log('Version conflict, retrying...');
+                        loadRentalLogs().then(() => {
+                            setTimeout(() => saveDocuments(retryCount + 1), 1000);
+                        });
+                    } else {
+                        alert('Failed to upload documents: ' + (xhr.responseJSON?.message || 'Server error'));
+                    }
+                },
+                complete: function() {
+                    if (xhr.status !== 409 || retryCount >= 3) {
+                        $('#dataSaveDocumentsBtn').prop('disabled', false).html('Upload Documents');
+                    }
+                }
+            });
+        };
+
+        saveDocuments();
+    });
+
+    // Function to load existing documents
+    function loadRentalDocuments(rentalId) {
+        $.get(`/api/rentals/${rentalId}/documents`, function(documents) {
+            const documentsList = $('#dataAddDocumentsModal .existing-documents-list');
+            documentsList.empty();
+            
+            if (documents && documents.length > 0) {
+                documents.forEach(doc => {
+                    documentsList.append(`
+                        <div class="document-entry mb-2 p-2 border-left border-primary">
+                            <a href="${doc.url}" target="_blank">${doc.name}</a>
+                            <small class="text-muted">(${new Date(doc.uploadDate).toLocaleString()})</small>
+                        </div>
+                    `);
+                });
+            } else {
+                documentsList.html('<p class="text-muted">No documents yet</p>');
+            }
+        });
+    }
   }
 
   // Return public methods
